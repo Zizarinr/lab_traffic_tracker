@@ -30,7 +30,7 @@ Satu halaman, satu state aktif, layar penuh.
 +----------------------------------------------+
 ```
 
-**BERHASIL** (3 detik, lalu kembali ke standby)
+**BERHASIL** (`WELCOME_SECONDS`, default 2 detik, lalu kembali ke standby)
 ```
 +----------------------------------------------+
 |  SELAMAT DATANG                              |
@@ -40,7 +40,7 @@ Satu halaman, satu state aktif, layar penuh.
 +----------------------------------------------+
 ```
 
-**TIDAK TERDAFTAR** (3 detik)
+**TIDAK TERDAFTAR** (`WELCOME_SECONDS`, default 2 detik)
 ```
 +----------------------------------------------+
 |  NIM TIDAK TERDAFTAR                         |
