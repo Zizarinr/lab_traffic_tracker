@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lab Scan KTM</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="screen" class="state-standby">
+      <!-- STANDBY -->
+      <section id="view-standby" class="view">
+        <header class="standby-top">
+          <span id="lab-name">LAB KOMPUTER</span>
+        </header>
+        <main class="standby-center">
+          <div class="standby-center-inner">
+            <h1 class="headline">SILAKAN SCAN KTM ANDA</h1>
+            <p id="manual-hint" class="manual-hint">KETIK NIM LALU TEKAN ENTER</p>
+            <p id="manual-input" class="manual-input"></p>
+          </div>
+        </main>
+        <footer class="standby-bottom">
+          <span id="today-counter">Hari ini: 0 kunjungan</span>
+          <span id="clock">--:--</span>
+        </footer>
+      </section>
+
+      <!-- BERHASIL -->
+      <section id="view-success" class="view">
+        <p class="label">SELAMAT DATANG</p>
+        <h1 id="s-nama" class="nama">NAMA MAHASISWA</h1>
+        <p id="s-kelas" class="meta">Kelas - | Semester -</p>
+        <p id="s-nim" class="nim">NIM -</p>
+      </section>
+
+      <!-- TIDAK TERDAFTAR -->
+      <section id="view-notfound" class="view">
+        <h1 class="headline">NIM TIDAK TERDAFTAR</h1>
+        <p class="label">Hubungi petugas lab</p>
+      </section>
+
+      <!-- SCAN GANDA -->
+      <section id="view-duplicate" class="view">
+        <h1 class="headline">SUDAH TERCATAT</h1>
+      </section>
+
+      <!-- SISTEM BERMASALAH -->
+      <section id="view-error" class="view">
+        <h1 class="headline">SISTEM BERMASALAH</h1>
+        <p class="label">Hubungi petugas lab</p>
+      </section>
+    </div>
+
+    <!-- Input tersembunyi untuk scanner keyboard-wedge. Selalu fokus. -->
+    <input
+      id="scanner"
+      type="text"
+      readonly
+      autocomplete="off"
+      autocapitalize="off"
+      autocorrect="off"
+      spellcheck="false"
+      aria-label="Input scanner"
+    />
+
+    <script src="app.js"></script>
+  </body>
+</html>

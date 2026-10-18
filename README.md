@@ -27,3 +27,15 @@ Scanner USB (keyboard-wedge) -> Browser kiosk -> POST /api/scan
 
 ## Urutan kerja
 Kerjakan `tasks.md` berurutan. Selesaikan dan uji Fase 1 (tanpa jaringan) sebelum menyentuh Fase 2 (sinkronisasi).
+
+## Menjalankan (Fase 1)
+```
+npm install                        # sekali saja
+npm run fixture                    # buat contoh Excel di fixtures/mahasiswa-sample.xlsx
+npm run import -- fixtures/mahasiswa-sample.xlsx   # import data mahasiswa
+npm start                          # jalankan server, buka http://127.0.0.1:3000
+```
+- Import ulang aman (upsert). Tambahkan `--replace` untuk menghapus mahasiswa yang tidak ada di file.
+- Konfigurasi ada di `.env` (lihat `.env.example`). `SYNC_ENABLED=false` selama Fase 1.
+- Database: `data/lab.db` (dibuat otomatis, mode WAL).
+- `MANUAL_INPUT=true` untuk uji tanpa scanner: NIM yang diketik tampil di layar, `Backspace` hapus 1 karakter, `Escape` bersihkan. Set `false` saat scanner asli sudah terpasang.

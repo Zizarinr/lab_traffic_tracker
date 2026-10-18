@@ -14,6 +14,7 @@
 | Berhasil | #1B8A3A | #FFFFFF |
 | Tidak terdaftar | #C62828 | #FFFFFF |
 | Scan ganda (opsional singkat) | #F9A825 | #000000 |
+| Sistem bermasalah | #37474F | #FFFFFF |
 
 ## State layar
 Satu halaman, satu state aktif, layar penuh.

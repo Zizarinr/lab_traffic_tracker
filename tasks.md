@@ -1,12 +1,13 @@
 # Tasks (kerjakan berurutan, uji tiap fase sebelum lanjut)
 
 ## Fase 1: Fungsi inti, tanpa internet
-- [ ] 1.1 Inisialisasi proyek Node, install `express`, `better-sqlite3`, `xlsx`, `dotenv`. `SYNC_ENABLED=false`.
+- [x] 1.1 Inisialisasi proyek Node, install `express`, `better-sqlite3`, `xlsx`, `dotenv`. `SYNC_ENABLED=false`.
 - [ ] 1.2 `src/db.js`: buat skema sesuai `database.md`, aktifkan WAL.
-- [ ] 1.3 `scripts/import-excel.js`: import kolom nim, nama, semester, kelas (NIM sebagai teks), cetak ringkasan.
+- [x] 1.3 `scripts/import-excel.js`: import kolom nim, nama, semester, kelas (NIM sebagai teks), cetak ringkasan.
 - [ ] 1.4 `POST /api/scan` dengan debounce 10 detik dan penyimpanan log. `GET /api/stats`, `GET /api/health`.
-- [ ] 1.5 Halaman kiosk (`public/`): state STANDBY, BERHASIL, TIDAK TERDAFTAR, SISTEM BERMASALAH sesuai `design.md`. Flat, tanpa gradasi/shadow, tanpa aset eksternal.
-- [ ] 1.6 Input scanner tersembunyi dengan fokus permanen dan penanganan Enter.
+- [x] 1.5 Halaman kiosk (`public/`): state STANDBY, BERHASIL, TIDAK TERDAFTAR, SISTEM BERMASALAH sesuai `design.md`. Flat, tanpa gradasi/shadow, tanpa aset eksternal.
+- [x] 1.6 Input scanner tersembunyi dengan fokus permanen dan penanganan Enter.
+- [x] 1.7 (Tambahan) Mode input manual untuk uji tanpa scanner: `MANUAL_INPUT=true` menampilkan NIM yang diketik di layar + petunjuk, `Backspace`/`Delete` hapus 1 karakter, `Escape` bersihkan. Scanner keyboard-wedge tetap jalan normal saat mode ini `false`.
 
 ### Uji Fase 1 (semua tanpa internet, cabut kabel/WiFi saat menguji)
 - [ ] NIM valid -> sambutan benar (nama, kelas, semester), log tersimpan.

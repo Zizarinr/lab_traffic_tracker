@@ -1,0 +1,176 @@
+/* Lab Scan KTM — UI flat, solid, kontras tinggi.
+   Tanpa gradasi, shadow, blur, animasi dekoratif, atau border-radius. */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  border-radius: 0;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #ffffff;
+  color: #000000;
+  font-family: Arial, Helvetica, sans-serif;
+  cursor: none;
+  user-select: none;
+}
+
+#screen {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+}
+
+/* Satu state aktif pada satu waktu. */
+.view {
+  display: none;
+  position: absolute;
+  inset: 0;
+  padding: 4vh 5vw;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+/* ---------- Palet per state ---------- */
+.state-standby {
+  background: #ffffff;
+  color: #000000;
+}
+.state-success {
+  background: #1b8a3a;
+  color: #ffffff;
+}
+.state-notfound {
+  background: #c62828;
+  color: #ffffff;
+}
+.state-duplicate {
+  background: #f9a825;
+  color: #000000;
+}
+.state-error {
+  background: #37474f;
+  color: #ffffff;
+}
+
+.state-standby #view-standby,
+.state-success #view-success,
+.state-notfound #view-notfound,
+.state-duplicate #view-duplicate,
+.state-error #view-error {
+  display: flex;
+}
+
+/* ---------- Tipografi ---------- */
+.headline {
+  font-size: 5.5vw;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: 0.02em;
+}
+
+.label {
+  font-size: 2.6vw;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.nama {
+  font-size: 8vw;
+  font-weight: 700;
+  line-height: 1.05;
+  margin-top: 1.5vh;
+}
+
+.meta {
+  font-size: 3.4vw;
+  font-weight: 700;
+  margin-top: 3vh;
+}
+
+.nim {
+  font-size: 2.4vw;
+  font-weight: 700;
+  margin-top: 3vh;
+  letter-spacing: 0.08em;
+}
+
+/* ---------- Standby: header, tengah, footer ---------- */
+#view-standby {
+  justify-content: space-between;
+  padding: 5vh 5vw;
+}
+
+.standby-top {
+  width: 100%;
+  text-align: left;
+  font-size: 2.6vw;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.standby-center {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.standby-center-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Mode input manual: tampil hanya bila body punya kelas manual-mode. */
+.manual-hint,
+.manual-input {
+  display: none;
+}
+
+body.manual-mode .manual-hint {
+  display: block;
+  margin-top: 6vh;
+  font-size: 1.6vw;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+body.manual-mode .manual-input {
+  display: block;
+  margin-top: 1.5vh;
+  min-height: 1.2em;
+  font-size: 6vw;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.standby-bottom {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  font-size: 2.4vw;
+  font-weight: 700;
+}
+
+/* ---------- Input scanner tersembunyi ---------- */
+#scanner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  border: 0;
+  outline: none;
+  opacity: 0;
+  cursor: none;
+}
