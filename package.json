@@ -5,6 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
+    "mock": "node scripts/mock-monitor.js",
     "fixture": "node scripts/make-fixture.js",
     "import": "node scripts/import-excel.js"
   },

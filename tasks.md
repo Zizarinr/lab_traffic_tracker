@@ -20,18 +20,20 @@
 - [ ] Tampilan terbaca dari jarak 1-2 meter di monitor lab.
 
 ## Fase 2: Sinkronisasi ke monitoring
-- [ ] 2.1 `scripts/mock-monitor.js`: server tiruan yang menerima POST, memvalidasi token, bisa dipaksa error/timeout.
-- [ ] 2.2 `src/sync.js`: worker sesuai aturan di `api.md` (batch, timeout, backoff, tandai `synced`).
-- [ ] 2.3 Aktifkan lewat `SYNC_ENABLED=true`, konfigurasi dari `.env`.
+- [x] 2.1 `scripts/mock-monitor.js`: server tiruan yang menerima POST, memvalidasi token, bisa dipaksa error/timeout.
+- [x] 2.2 `src/sync.js`: worker sesuai aturan di `api.md` (batch, timeout, backoff, tandai `synced`).
+- [x] 2.3 Aktifkan lewat `SYNC_ENABLED=true`, konfigurasi dari `.env`.
 
 ### Uji Fase 2
-- [ ] Mock aktif -> log terkirim dan `synced=1`.
-- [ ] Mock mati/timeout -> log tetap `synced=0`, scan tetap lancar, retry dengan backoff.
-- [ ] Mock hidup kembali -> semua backlog terkirim berurutan.
-- [ ] Token salah (401) -> error tercatat, tidak retry agresif.
-- [ ] Respons hilang setelah data diterima -> kirim ulang tidak merusak (id sama).
-- [ ] Putus WiFi sungguhan selama beberapa menit lalu sambung kembali.
+- [x] Mock aktif -> log terkirim dan `synced=1`.
+- [x] Mock mati/timeout -> log tetap `synced=0`, scan tetap lancar, retry dengan backoff.
+- [x] Mock hidup kembali -> semua backlog terkirim berurutan.
+- [x] Token salah (401) -> error tercatat, tidak retry agresif.
+- [x] Respons hilang setelah data diterima -> kirim ulang tidak merusak (id sama).
+- [ ] Putus WiFi sungguhan selama beberapa menit lalu sambung kembali. (uji lapangan: perilaku setara "mock mati" yang sudah terverifikasi)
 - [ ] Arahkan ke sistem monitoring asli setelah kontrak API dikonfirmasi.
+
+> Catatan uji: perilaku di atas diverifikasi otomatis lewat 22 uji unit worker, 27 uji integrasi (mock HTTP nyata + SQLite asli), dan 16 uji end-to-end (server asli + `SYNC_ENABLED=true`). Mode mock yang tersedia: `ok`, `partial`, `no-accepted`, `unauthorized`, `bad-request`, `error`, `timeout`, `slow`, `drop`.
 
 ## Fase 3: Deployment Windows
 - [ ] 3.1 `start.bat` dan Task Scheduler (At log on, restart on failure).

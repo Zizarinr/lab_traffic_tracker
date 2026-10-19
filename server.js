@@ -51,18 +51,38 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'internal' });
 });
 
+let syncWorker = null;
+let syncLogger = null;
+
 const server = app.listen(config.port, '127.0.0.1', () => {
   console.log('Lab Scan KTM siap.');
   console.log(`  URL      : http://127.0.0.1:${config.port}`);
   console.log(`  Lab      : ${config.labName}`);
   console.log(`  Database : ${DB_PATH}`);
   console.log(`  Debounce : ${config.debounceSeconds} detik`);
-  console.log(`  Sync     : ${config.syncEnabled ? 'aktif' : 'nonaktif (Fase 1)'}`);
-  // Fase 2: worker sinkronisasi dimulai di sini bila config.syncEnabled.
+  console.log(`  Sambutan : ${config.welcomeSeconds} detik`);
+  console.log(`  Input    : ${config.manualInput ? 'manual (uji)' : 'scanner kiosk'}`);
+
+  // Fase 2: worker sinkronisasi.
+  if (!config.syncEnabled) {
+    console.log('  Sync     : nonaktif (SYNC_ENABLED=false)');
+    return;
+  }
+  if (!/^https?:\/\//.test(config.monitorUrl)) {
+    console.warn('  Sync     : SYNC_ENABLED=true tapi MONITOR_URL belum diisi/belum sah -> tidak dijalankan.');
+    return;
+  }
+  const { createSyncWorker, createLogger } = require('./src/sync');
+  syncLogger = createLogger(path.join(__dirname, 'logs', 'sync.log'));
+  syncWorker = createSyncWorker({ db, cfg: config, logger: syncLogger });
+  syncWorker.start();
+  console.log(`  Sync     : aktif -> ${config.monitorUrl} (interval ${config.syncIntervalSeconds}s)`);
 });
 
 function shutdown() {
+  if (syncWorker) syncWorker.stop();
   server.close(() => {
+    if (syncLogger) syncLogger.close();
     try {
       db.close();
     } catch (err) {

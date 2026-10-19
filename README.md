@@ -39,3 +39,19 @@ npm start                          # jalankan server, buka http://127.0.0.1:3000
 - Konfigurasi ada di `.env` (lihat `.env.example`). `SYNC_ENABLED=false` selama Fase 1.
 - Database: `data/lab.db` (dibuat otomatis, mode WAL).
 - `MANUAL_INPUT=true` untuk uji tanpa scanner: NIM yang diketik tampil di layar, `Backspace` hapus 1 karakter, `Escape` bersihkan. Set `false` saat scanner asli sudah terpasang.
+
+## Menjalankan sinkronisasi (Fase 2)
+Uji lokal dengan server monitoring tiruan:
+```
+npm run mock        # terminal 1: mock monitor di http://127.0.0.1:4000 (token: secret-token)
+npm start           # terminal 2: aplikasi kiosk
+```
+Di `.env` set `SYNC_ENABLED=true`, `MONITOR_URL=http://127.0.0.1:4000/api/lab/traffic`, `MONITOR_TOKEN=secret-token`.
+
+- Log terkirim otomatis tiap `SYNC_INTERVAL_SECONDS` (produksi 300 = 5 menit).
+- Cek backlog: `GET /api/stats` -> `pending_sync`.
+- Catatan sinkronisasi: `logs/sync.log`.
+- Ubah perilaku mock: `POST http://127.0.0.1:4000/control/mode` body `{"mode":"timeout"}` (lihat `scripts/mock-monitor.js` untuk daftar mode).
+- Melihat data yang diterima mock: `GET http://127.0.0.1:4000/control/received`.
+
+**Ke sistem monitoring asli:** ganti `MONITOR_URL` dan `MONITOR_TOKEN` di `.env` setelah kontrak API dikonfirmasi. Tidak ada perubahan kode.

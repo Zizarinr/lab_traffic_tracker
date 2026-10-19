@@ -25,9 +25,14 @@ lab-scan/
     app.js
   scripts/
     import-excel.js    # CLI: node scripts/import-excel.js data.xlsx
+    make-fixture.js    # buat fixtures/mahasiswa-sample.xlsx untuk uji
     mock-monitor.js    # server monitoring tiruan untuk uji Fase 2
+  fixtures/
+    mahasiswa-sample.xlsx  # contoh data uji import
   data/
     lab.db             # dibuat otomatis, jangan di-commit
+  logs/
+    sync.log           # catatan status sinkronisasi, jangan di-commit
   .env
   start.bat
   package.json
