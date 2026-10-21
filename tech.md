@@ -27,12 +27,18 @@ lab-scan/
     import-excel.js    # CLI: node scripts/import-excel.js data.xlsx
     make-fixture.js    # buat fixtures/mahasiswa-sample.xlsx untuk uji
     mock-monitor.js    # server monitoring tiruan untuk uji Fase 2
+    backup.js          # backup database (online backup API, aman saat server jalan)
+    setup-task.ps1     # daftarkan Task Scheduler (start.bat saat logon + restart gagal)
+    setup-shortcut.ps1 # shortcut browser kiosk di shell:startup
+    setup-system.ps1   # setelan Windows: layar nyala, tanpa sleep, anti-reboot Update
   fixtures/
     mahasiswa-sample.xlsx  # contoh data uji import
   data/
     lab.db             # dibuat otomatis, jangan di-commit
+    backups/           # hasil npm run backup, jangan di-commit
   logs/
     sync.log           # catatan status sinkronisasi, jangan di-commit
+    server.log         # log start.bat (deployment), jangan di-commit
   .env
   start.bat
   package.json
@@ -44,7 +50,8 @@ PORT=3000
 LAB_NAME=LAB-1
 DEBOUNCE_SECONDS=10
 WELCOME_SECONDS=2
-SYNC_ENABLED=false          # false di Fase 1
+MANUAL_INPUT=true           # true selama scanner asli belum ada; false = kiosk murni
+SYNC_ENABLED=false          # false selama sistem monitoring asli belum siap
 SYNC_INTERVAL_SECONDS=300
 SYNC_BATCH_SIZE=100
 SYNC_TIMEOUT_SECONDS=10
@@ -58,9 +65,9 @@ MONITOR_TOKEN=
 - Jam dan zona waktu: simpan ISO 8601 dengan offset +07:00.
 
 ## Deployment Windows
-- `start.bat`: `cd` ke folder proyek lalu `node server.js`.
-- Auto-start: Task Scheduler, trigger "At log on", jalankan `start.bat`, opsi restart saat gagal.
-- Browser kiosk: shortcut di `shell:startup`:
-  `chrome.exe --kiosk --incognito http://localhost:3000` (Edge: `msedge.exe --kiosk http://localhost:3000 --edge-kiosk-type=fullscreen`).
-- Matikan sleep/screen-off dan pembaruan otomatis yang me-reboot di jam ramai.
-- Backup: salin `data/lab.db` berkala (mis. ke flashdisk) selama jam tidak ramai.
+Instalasi sekali jalan di PC lab (rincian di `README.md` bagian "Deployment Windows"):
+- `start.bat`: entry deployment; output server dicatat ke `logs/server.log`.
+- `scripts/setup-system.ps1`: matikan sleep/screen-off (`powercfg`) dan cegah Windows Update me-reboot sendiri (registri `NoAutoRebootWithLoggedOnUsers` + jam aktif). Jalankan sebagai admin.
+- `scripts/setup-task.ps1`: Task Scheduler trigger "At log on" → `start.bat`, restart otomatis saat gagal (3×, tiap 1 menit).
+- `scripts/setup-shortcut.ps1`: shortcut browser kiosk di `shell:startup`; deteksi Chrome→Brave→Edge→Helium. Flag: `--kiosk --profile-directory=LabKiosk --no-first-run --use-fake-ui-for-media-stream http://localhost:3000` — **tanpa `--incognito`** supaya izin kamera tersimpan (persiapan mode kamera Fase 4).
+- Backup: `npm run backup` (SQLite online backup API → `data/backups/lab-<waktu>.db`), aman dijalankan walau server hidup. Restore & import ulang Excel: lihat README.

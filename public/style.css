@@ -110,10 +110,28 @@ body {
 
 .standby-top {
   width: 100%;
-  text-align: left;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 2vw;
   font-size: 2.6vw;
   font-weight: 700;
   letter-spacing: 0.04em;
+}
+
+/* Pengingat: tampil hanya saat sinkronisasi nonaktif (SYNC_ENABLED=false). */
+.sync-reminder {
+  display: none;
+  background: #f9a825;
+  color: #000000;
+  font-size: 1.4vw;
+  line-height: 1.35;
+  padding: 0.8vh 1vw;
+  text-align: right;
+}
+
+body.sync-off .sync-reminder {
+  display: block;
 }
 
 .standby-center {

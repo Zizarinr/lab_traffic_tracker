@@ -15,6 +15,7 @@ const screenEl = document.getElementById('screen');
 const scannerEl = document.getElementById('scanner');
 const labNameEl = document.getElementById('lab-name');
 const counterEl = document.getElementById('today-counter');
+const syncReminderEl = document.getElementById('sync-reminder');
 const manualInputEl = document.getElementById('manual-input');
 const sNama = document.getElementById('s-nama');
 const sKelas = document.getElementById('s-kelas');
@@ -23,9 +24,18 @@ const sNim = document.getElementById('s-nim');
 const MAX_BUFFER = 64;
 const HEALTH_POLL_MS = 5000;
 const STATS_REFRESH_MS = 60000;
+// Deteksi scanner keyboard-wedge dari kecepatan ketikan (Fase 3):
+// manusia ~100-300 ms per karakter, scanner ~2-10 ms per karakter.
+const SCANNER_GAP_MS = 30;
+const SCANNER_MIN_GAPS = 2;
 
 let welcomeSeconds = 3;
 let manualMode = false;
+let syncEnabled = true;
+let pendingSync = 0;
+let scannerDetected = false;
+let lastKeyAt = 0;
+let fastGaps = 0;
 let stateTimer = null;
 let healthTimer = null;
 let buffer = '';
@@ -58,6 +68,17 @@ function showError() {
   startHealthPoll();
 }
 
+/** Pengingat status sinkronisasi: tampil di layar standby bila nonaktif. */
+function renderSyncReminder() {
+  document.body.classList.toggle('sync-off', !syncEnabled);
+  if (syncEnabled) {
+    syncReminderEl.textContent = '';
+  } else {
+    syncReminderEl.textContent =
+      `PENGINGAT: SINKRONISASI NONAKTIF — ${pendingSync} log menunggu`;
+  }
+}
+
 /* ---------------- Komunikasi server ---------------- */
 
 async function loadConfig() {
@@ -71,6 +92,8 @@ async function loadConfig() {
     }
     manualMode = data.manual_input === true;
     document.body.classList.toggle('manual-mode', manualMode);
+    syncEnabled = data.sync_enabled !== false;
+    renderSyncReminder();
   } catch (err) {
     /* pakai nilai default; server belum siap */
   }
@@ -82,6 +105,8 @@ async function refreshStats() {
     if (!res.ok) return;
     const data = await res.json();
     counterEl.textContent = `Hari ini: ${data.today || 0} kunjungan`;
+    pendingSync = Number.isFinite(data.pending_sync) ? data.pending_sync : 0;
+    renderSyncReminder();
   } catch (err) {
     /* diamkan; counter diperbarui lagi di siklus berikutnya */
   }
@@ -174,6 +199,8 @@ document.addEventListener('keydown', (event) => {
 
   if (event.key === 'Enter') {
     event.preventDefault();
+    lastKeyAt = 0; // Enter menutup satu "burst"; deteksi dimulai lagi dari nol.
+    fastGaps = 0;
     const raw = buffer;
     buffer = '';
     renderBuffer();
@@ -196,12 +223,30 @@ document.addEventListener('keydown', (event) => {
   }
 
   if (event.key.length === 1) {
+    noteKeyTiming();
     if (buffer.length < MAX_BUFFER) {
       buffer += event.key;
       renderBuffer();
     }
   }
 });
+
+/**
+ * Deteksi scanner keyboard-wedge dari kecepatan ketikan.
+ * Bila >=SCANNER_MIN_GAPS karakter berturut-turut berjarak <=SCANNER_GAP_MS
+ * (mustahil bagi manusia), scanner dianggap terdeteksi dan echo/petunjuk
+ * mode manual disembunyikan selama sesi ini (tampil seperti kiosk murni).
+ * Fallback bila deteksi meleset: set MANUAL_INPUT=false di .env.
+ */
+function noteKeyTiming() {
+  const now = Date.now();
+  fastGaps = lastKeyAt > 0 && now - lastKeyAt <= SCANNER_GAP_MS ? fastGaps + 1 : 0;
+  lastKeyAt = now;
+  if (!scannerDetected && fastGaps >= SCANNER_MIN_GAPS) {
+    scannerDetected = true;
+    document.body.classList.remove('manual-mode');
+  }
+}
 
 scannerEl.addEventListener('blur', () => {
   setTimeout(focusScanner, 0);

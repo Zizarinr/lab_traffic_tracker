@@ -24,6 +24,7 @@ app.get('/api/config', (req, res) => {
     lab_name: config.labName,
     welcome_seconds: config.welcomeSeconds,
     manual_input: config.manualInput,
+    sync_enabled: config.syncEnabled,
   });
 });
 

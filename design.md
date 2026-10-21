@@ -22,13 +22,14 @@ Satu halaman, satu state aktif, layar penuh.
 **STANDBY**
 ```
 +----------------------------------------------+
-|  LAB KOMPUTER (nama dari LAB_NAME)           |
-|                                              |
+|  LAB KOMPUTER            PENGINGAT: SYNC MATI|
+|                          (hanya bila nonaktif)|
 |        SILAKAN SCAN KTM ANDA                 |
 |                                              |
 |  Hari ini: 42 kunjungan            14:30     |
 +----------------------------------------------+
 ```
+- Pojok kanan-atas hanya terisi bila sinkronisasi nonaktif: blok solid amber (#F9A825) dengan teks hitam `PENGINGAT: SINKRONISASI NONAKTIF — N log menunggu` (N dari `pending_sync`). Bila sinkronisasi aktif, area kosong (tidak ada indikator).
 
 **BERHASIL** (`WELCOME_SECONDS`, default 2 detik, lalu kembali ke standby)
 ```
@@ -56,6 +57,11 @@ Satu halaman, satu state aktif, layar penuh.
 - Karakter dari scanner datang sangat cepat. Jika Enter datang tanpa input, abaikan.
 - Saat state sambutan sedang tampil dan scan baru masuk, state diganti langsung dengan scan terbaru dan timer 3 detik di-reset.
 - Jika server tidak merespons, tampilkan state "SISTEM BERMASALAH, hubungi petugas" dan coba lagi otomatis tanpa memblokir.
+
+## Mode input manual & deteksi scanner (Fase 3)
+- `MANUAL_INPUT=true` (sebelum scanner asli terpasang): NIM yang diketik manusia tampil besar di tengah layar + petunjuk "KETIK NIM LALU TEKAN ENTER". `Backspace`/`Delete` hapus 1 karakter, `Escape` bersihkan.
+- **Deteksi otomatis scanner**: scanner keyboard-wedge mengetik ~2–10 ms/karakter; manusia ~100–300 ms/karakter. Bila ≥3 karakter berturut-turut berjarak ≤30 ms, scanner dianggap terdeteksi → petunjuk dan echo disembunyikan selama sesi (layar bersih seperti kiosk murni), tetapi scan tetap jalan normal.
+- `MANUAL_INPUT=false` = kiosk murni sejak awal (echo tidak pernah tampil). Bila deteksi otomatis ternyata meleset di lapangan, gunakan `false` sebagai override keras.
 
 ## Jam dan counter
 - Jam di pojok standby diperbarui tiap detik dari jam PC.
