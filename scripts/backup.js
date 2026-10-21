@@ -55,6 +55,12 @@ async function main() {
   // Online backup: salinan konsisten walau server sedang menulis (WAL).
   await db.backup(destFile);
 
+  // Jadikan berkas tunggal: keluar dari mode WAL agar -wal/-shm ikut
+  // tergabung dan cadangan bisa disalin sebagai SATU file (mis. ke flashdisk).
+  const target = new Database(destFile);
+  target.pragma('journal_mode = DELETE');
+  target.close();
+
   // Verifikasi: buka hasil backup dan jalankan integrity_check.
   const backup = new Database(destFile, { readonly: true });
   const integrity = backup.pragma('integrity_check', { simple: true });
