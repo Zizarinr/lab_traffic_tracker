@@ -74,8 +74,15 @@ Catatan:
 - **Auto-logon (langkah 7) wajib**: task server berpemicu "saat logon" — bila Windows masih minta password tiap menyala, aplikasi **tidak akan hidup sendiri** setelah mati listrik. Caranya: jalankan `netplwiz` → pilih akun kiosk → **hapus centang** *Users must enter a user name and password to use this computer* → OK → masukkan password akun 2×. Bila akunnya akun Microsoft atau PC dikelola IT kampus, minta pihak IT mengaktifkan auto-logon (registry `AutoAdminLogon`) agar lebih andal. **Keamanan:** pakai akun lokal khusus kiosk (bukan akun admin/kampus).
 - Script 4–6 punya mode `-WhatIf` (lihat rencana) dan `-Info` (khusus script 4: cek setelan tanpa mengubah).
 - Shortcut kiosk memakai profile khusus `LabKiosk` tanpa incognito, supaya izin kamera tersimpan (persiapan mode kamera nanti).
-- Log server: `logs/server.log` (dipakai `start.bat`), log sinkronisasi: `logs/sync.log`.
+- Log server: `logs/server.log` (dipakai `start.bat`), log sinkronisasi: `logs/sync.log`. Log dirotasi otomatis menjadi `*.old` bila melebihi 1 MB (saat `start.bat`/`backup.bat` mulai; `sync.log` saat server start) — aman untuk PC yang menyala 24/7.
 - Saat sistem monitoring asli belum siap: `SYNC_ENABLED=false` (layar standby menampilkan pengingat + jumlah log menunggu).
+
+## Diagnosis cepat
+Saat ada yang terasa aneh (server tidak hidup, data menumpuk, NIM yang seharusnya terdaftar jadi tidak dikenal, dsb.), jalankan satu perintah:
+```
+npm run checkup
+```
+Memeriksa: konfigurasi `.env`, integritas + hitungan database, status server, ukuran & akhir isi file log, backup terbaru, task Windows (server & backup), serta 5 scan terakhir — lalu menyimpulkan **SEHAT** atau menandai masalahnya dengan ❌. Aman dijalankan kapan saja (hanya membuka database, tanpa mengubah data).
 
 ## Backup & pemulihan
 ```
