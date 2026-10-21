@@ -6,3 +6,5 @@ data/*.db-shm
 data/backups/*
 !data/backups/.gitkeep
 logs/
+# File kunci sementara buatan Microsoft Excel (jangan di-commit)
+~$*
