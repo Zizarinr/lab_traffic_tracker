@@ -66,10 +66,12 @@ npm run import -- <file-data-mahasiswa.xlsx>   # 3. (opsional) isi database koso
 powershell -ExecutionPolicy Bypass -File scripts\setup-system.ps1    # 4. SETELAH UAC: layar nyala terus, PC tidak sleep, Update tidak reboot sendiri
 powershell -ExecutionPolicy Bypass -File scripts\setup-task.ps1      # 5. Task Scheduler: server saat logon (+restart gagal) & BACKUP HARIAN jam 17:00
 powershell -ExecutionPolicy Bypass -File scripts\setup-shortcut.ps1  # 6. shortcut browser mode kiosk di shell:startup
-shutdown /r /t 0                                              # 7. uji: restart PC, semuanya harus hidup sendiri
+netplwiz                                                        # 7. auto-logon (wajib): supaya Windows login sendiri saat PC dinyalakan
+shutdown /r /t 0                                              # 8. uji: restart PC, semuanya harus hidup sendiri
 ```
 
 Catatan:
+- **Auto-logon (langkah 7) wajib**: task server berpemicu "saat logon" — bila Windows masih minta password tiap menyala, aplikasi **tidak akan hidup sendiri** setelah mati listrik. Caranya: jalankan `netplwiz` → pilih akun kiosk → **hapus centang** *Users must enter a user name and password to use this computer* → OK → masukkan password akun 2×. Bila akunnya akun Microsoft atau PC dikelola IT kampus, minta pihak IT mengaktifkan auto-logon (registry `AutoAdminLogon`) agar lebih andal. **Keamanan:** pakai akun lokal khusus kiosk (bukan akun admin/kampus).
 - Script 4–6 punya mode `-WhatIf` (lihat rencana) dan `-Info` (khusus script 4: cek setelan tanpa mengubah).
 - Shortcut kiosk memakai profile khusus `LabKiosk` tanpa incognito, supaya izin kamera tersimpan (persiapan mode kamera nanti).
 - Log server: `logs/server.log` (dipakai `start.bat`), log sinkronisasi: `logs/sync.log`.
