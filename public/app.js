@@ -33,7 +33,7 @@ let welcomeSeconds = 3;
 let manualMode = false;
 let syncEnabled = true;
 let pendingSync = 0;
-let scannerDetected = false;
+let scannerBurst = false; // true selama ketikan datang dari scanner (echo disembunyikan)
 let lastKeyAt = 0;
 let fastGaps = 0;
 let stateTimer = null;
@@ -201,6 +201,7 @@ document.addEventListener('keydown', (event) => {
     event.preventDefault();
     lastKeyAt = 0; // Enter menutup satu "burst"; deteksi dimulai lagi dari nol.
     fastGaps = 0;
+    scannerBurst = false; // ketikan berikutnya dianggap manusia sampai scanner terdeteksi lagi.
     const raw = buffer;
     buffer = '';
     renderBuffer();
@@ -224,6 +225,10 @@ document.addEventListener('keydown', (event) => {
 
   if (event.key.length === 1) {
     noteKeyTiming();
+    // Ketikan manusia: echo/petunjuk tampil kembali (alur cadangan: KTM rusak -> petugas ketik NIM).
+    if (manualMode && !scannerBurst) {
+      document.body.classList.add('manual-mode');
+    }
     if (buffer.length < MAX_BUFFER) {
       buffer += event.key;
       renderBuffer();
@@ -234,17 +239,19 @@ document.addEventListener('keydown', (event) => {
 /**
  * Deteksi scanner keyboard-wedge dari kecepatan ketikan.
  * Bila >=SCANNER_MIN_GAPS karakter berturut-turut berjarak <=SCANNER_GAP_MS
- * (mustahil bagi manusia), scanner dianggap terdeteksi dan echo/petunjuk
- * mode manual disembunyikan selama sesi ini (tampil seperti kiosk murni).
- * Fallback bila deteksi meleset: set MANUAL_INPUT=false di .env.
+ * (mustahil bagi manusia), ketikan dianggap burst scanner dan echo/petunjuk
+ * mode manual disembunyikan hingga Enter. Ketikan manusia berikutnya
+ * menampilkan echo kembali, jadi mode manual tetap nyaman dipakai sebagai
+ * cadangan saat KTM gagal discan. Fallback bila deteksi meleset: MANUAL_INPUT=false.
  */
 function noteKeyTiming() {
   const now = Date.now();
   fastGaps = lastKeyAt > 0 && now - lastKeyAt <= SCANNER_GAP_MS ? fastGaps + 1 : 0;
   lastKeyAt = now;
-  if (!scannerDetected && fastGaps >= SCANNER_MIN_GAPS) {
-    scannerDetected = true;
+  if (!scannerBurst && fastGaps >= SCANNER_MIN_GAPS) {
+    scannerBurst = true;
     document.body.classList.remove('manual-mode');
+    manualInputEl.textContent = '';
   }
 }
 

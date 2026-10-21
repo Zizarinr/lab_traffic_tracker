@@ -60,8 +60,7 @@ Satu halaman, satu state aktif, layar penuh.
 
 ## Mode input manual & deteksi scanner (Fase 3)
 - `MANUAL_INPUT=true` (sebelum scanner asli terpasang): NIM yang diketik manusia tampil besar di tengah layar + petunjuk "KETIK NIM LALU TEKAN ENTER". `Backspace`/`Delete` hapus 1 karakter, `Escape` bersihkan.
-- **Deteksi otomatis scanner**: scanner keyboard-wedge mengetik ~2–10 ms/karakter; manusia ~100–300 ms/karakter. Bila ≥3 karakter berturut-turut berjarak ≤30 ms, scanner dianggap terdeteksi → petunjuk dan echo disembunyikan selama sesi (layar bersih seperti kiosk murni), tetapi scan tetap jalan normal.
-- `MANUAL_INPUT=false` = kiosk murni sejak awal (echo tidak pernah tampil). Bila deteksi otomatis ternyata meleset di lapangan, gunakan `false` sebagai override keras.
+- **Deteksi otomatis scanner**: scanner keyboard-wedge mengetik ~2–10 ms/karakter; manusia ~100–300 ms/karakter. Bila ≥3 karakter berturut-turut berjarak ≤30 ms, ketikan dianggap **burst scanner** → petunjuk dan echo disembunyikan sampai Enter (layar bersih, tanpa kilatan NIM). Ketikan **manusia berikutnya menampilkan echo kembali**, jadi mode manual tetap nyaman sebagai cadangan saat KTM gagal discan. `MANUAL_INPUT=false` = kiosk murni sejak awal (echo tidak pernah tampil).
 
 ## Jam dan counter
 - Jam di pojok standby diperbarui tiap detik dari jam PC.

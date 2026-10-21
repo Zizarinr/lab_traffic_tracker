@@ -42,7 +42,7 @@
 - [x] 3.4 Prosedur backup `data/lab.db` dan cara import ulang Excel (dokumentasikan di README). → `scripts/backup.js` (SQLite online backup API, aman saat server jalan, verifikasi `integrity_check`, `--keep=N`) + npm `backup` + README (deployment, backup/pemulihan, import ulang)
 - [ ] 3.5 Uji akhir: nyalakan PC dari kondisi mati, semuanya hidup sendiri tanpa tindakan manual. (checklist di README bagian "Deployment Windows"; jalankan di PC lab)
 - [x] 3.6 (Baru) Pengingat status sinkronisasi di layar standby: saat `SYNC_ENABLED=false`, pojok kanan-atas menampilkan `PENGINGAT: SINKRONISASI NONAKTIF — N log menunggu` (amber, flat). `/api/config` kirim `sync_enabled`.
-- [x] 3.7 (Baru) Deteksi otomatis scanner keyboard-wedge: ketikan ≥3 karakter berjarak ≤30 ms = scanner → echo/petunjuk mode manual disembunyikan selama sesi (tampil seperti kiosk murni). `MANUAL_INPUT=false` tetap override keras; fallback bila deteksi meleset.
+- [x] 3.7 (Baru) Deteksi otomatis scanner keyboard-wedge: ketikan ≥3 karakter berjarak ≤30 ms = burst scanner → echo/petunjuk mode manual disembunyikan selama burst (berakhir di Enter); ketikan manual berikutnya menampilkannya kembali. Teruji di lapangan dengan scanner asli. `MANUAL_INPUT=false` tetap override keras; fallback bila deteksi meleset.
 
 ### Uji Fase 3
 - [x] `start.bat`: server hidup ~2 detik, output tercatat di `logs/server.log`.
