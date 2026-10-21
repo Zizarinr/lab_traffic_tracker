@@ -40,7 +40,7 @@
 - [x] 3.2 Shortcut browser kiosk di `shell:startup`. → `scripts/setup-shortcut.ps1` (deteksi Chrome→Brave→Edge→Helium; `--kiosk` + profile `LabKiosk`, tanpa incognito, izin kamera siap Fase 4)
 - [x] 3.3 Nonaktifkan sleep, screen-off, dan reboot otomatis Windows Update di jam ramai. → `scripts/setup-system.ps1` (`-Info` cek tanpa admin, default = terapkan + auto-UAC, jam aktif 07:00–21:00). ⚠️ Jalankan di PC LAB (mesin dev sengaja tidak diubah: masih sleep 15 mnt / layar 5 mnt)
 - [x] 3.4 Prosedur backup `data/lab.db` dan cara import ulang Excel (dokumentasikan di README). → `scripts/backup.js` (SQLite online backup API, aman saat server jalan, verifikasi `integrity_check`, `--keep=N`) + npm `backup` + README (deployment, backup/pemulihan, import ulang)
-- [ ] 3.5 Uji akhir: nyalakan PC dari kondisi mati, semuanya hidup sendiri tanpa tindakan manual. (checklist di README bagian "Deployment Windows"; jalankan di PC lab)
+- [ ] 3.5 Uji akhir: nyalakan PC dari kondisi mati, semuanya hidup sendiri tanpa tindakan manual. (checklist di README bagian "Deployment Windows"; jalankan di PC lab) Prasyarat: **auto-logon Windows** (langkah 7 README, `netplwiz`) — tanpa ini task tidak jalan saat boot.
 - [x] 3.6 (Baru) Pengingat status sinkronisasi di layar standby: saat `SYNC_ENABLED=false`, pojok kanan-atas menampilkan `PENGINGAT: SINKRONISASI NONAKTIF — N log menunggu` (amber, flat). `/api/config` kirim `sync_enabled`.
 - [x] 3.7 (Baru) Deteksi otomatis scanner keyboard-wedge: ketikan ≥3 karakter berjarak ≤30 ms = burst scanner → echo/petunjuk mode manual disembunyikan selama burst (berakhir di Enter); ketikan manual berikutnya menampilkannya kembali. Teruji di lapangan dengan scanner asli. `MANUAL_INPUT=false` tetap override keras; fallback bila deteksi meleset.
 
@@ -56,6 +56,11 @@
 - [ ] Set scanner asli terpasang: pastikan echo hilang otomatis (terdeteksi) atau set `MANUAL_INPUT=false` bila perlu.
 
 - [x] 3.8 (Baru) Backup terjadwal otomatis: `setup-task.ps1` mendaftarkan task kedua `LabScanKTM-Backup` (harian jam 17:00, `backup.bat --keep=30`, hasil ke `logs/backup.log`). Param `-BackupHour`/`-BackupKeep`. Terverifikasi: task nyata dijalankan via Task Scheduler → file backup bertambah + integrity ok.
+- [x] 3.9 (Baru, pasca evaluasi logika menyeluruh) Peningkatan pemeliharaan:
+  - `npm run checkup` — diagnosis satu perintah: konfigurasi, integritas + hitungan DB, status server, log, backup terbaru, task Windows, 5 scan terakhir. (Langsung terbukti saat uji: menemukan tabel `mahasiswa` yang kosong.)
+  - Pengaman importer: `--replace` dengan file **0 baris valid** kini DITOLAK (sebelumnya mengosongkan seluruh tabel — insiden hari ini dipulihkan dari fixture; uji 3 kasus lulus).
+  - Rotasi log >1 MB → `*.log.old` (`start.bat`, `backup.bat`, `sync.log` saat server mulai). Kegagalan tulis log (disk penuh/file hilang) ditahan — stream dilepas, server tidak ikut crash. Uji: 8/8 (server) + 7/7 (backup).
+  - Pesan jelas `GAGAL: port ... sudah terpakai` alih-alih stack trace; callback `listen` yang ikut terpanggil walau bind gagal (quirk Node 24 + Express 5) diabaikan via cek `server.listening` agar banner/sync tidak menyesatkan. Uji jalur gagal+sukses: 10/10.
 
 ## Fase 4: Backlog (setelah hardware & sistem monitoring siap)
 - [ ] 4.1 Mode kamera (jalur A: **decode barcode/QR, bukan OCR**): flag `INPUT_MODE=scanner|camera|manual`, module `public/camera.js` (getUserMedia + decoder lokal di `public/vendor/`, tanpa CDN), hasil decode masuk `submitScan()` yang sama. Server/DB/sync: nol perubahan.
