@@ -55,6 +55,8 @@
 - [ ] Uji nyala-dari-mati di PC lab (mencakup 3.1–3.3 sekaligus) — oleh petugas.
 - [ ] Set scanner asli terpasang: pastikan echo hilang otomatis (terdeteksi) atau set `MANUAL_INPUT=false` bila perlu.
 
+- [x] 3.8 (Baru) Backup terjadwal otomatis: `setup-task.ps1` mendaftarkan task kedua `LabScanKTM-Backup` (harian jam 17:00, `backup.bat --keep=30`, hasil ke `logs/backup.log`). Param `-BackupHour`/`-BackupKeep`. Terverifikasi: task nyata dijalankan via Task Scheduler → file backup bertambah + integrity ok.
+
 ## Fase 4: Backlog (setelah hardware & sistem monitoring siap)
 - [ ] 4.1 Mode kamera (jalur A: **decode barcode/QR, bukan OCR**): flag `INPUT_MODE=scanner|camera|manual`, module `public/camera.js` (getUserMedia + decoder lokal di `public/vendor/`, tanpa CDN), hasil decode masuk `submitScan()` yang sama. Server/DB/sync: nol perubahan.
 - [ ] 4.2 Uji kamera: kecepatan decode vs N4 (<300 ms), akurasi di cahaya lab asli, izin tersimpan di profile `LabKiosk`.

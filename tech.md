@@ -40,7 +40,8 @@ lab-scan/
     sync.log           # catatan status sinkronisasi, jangan di-commit
     server.log         # log start.bat (deployment), jangan di-commit
   .env
-  start.bat
+  start.bat            # entry deployment (server), log ke logs/server.log
+  backup.bat           # entry backup terjadwal, log ke logs/backup.log
   package.json
 ```
 
@@ -68,6 +69,6 @@ MONITOR_TOKEN=
 Instalasi sekali jalan di PC lab (rincian di `README.md` bagian "Deployment Windows"):
 - `start.bat`: entry deployment; output server dicatat ke `logs/server.log`.
 - `scripts/setup-system.ps1`: matikan sleep/screen-off (`powercfg`) dan cegah Windows Update me-reboot sendiri (registri `NoAutoRebootWithLoggedOnUsers` + jam aktif). Jalankan sebagai admin.
-- `scripts/setup-task.ps1`: Task Scheduler trigger "At log on" → `start.bat`, restart otomatis saat gagal (3×, tiap 1 menit).
+- `scripts/setup-task.ps1`: mendaftarkan 2 task Task Scheduler — server (trigger "At log on" → `start.bat`, restart otomatis saat gagal 3×/1 menit) dan **backup harian** (`LabScanKTM-Backup`, `backup.bat --keep=30` jam 17:00, log ke `logs/backup.log`).
 - `scripts/setup-shortcut.ps1`: shortcut browser kiosk di `shell:startup`; deteksi Chrome→Brave→Edge→Helium. Flag: `--kiosk --profile-directory=LabKiosk --no-first-run --use-fake-ui-for-media-stream http://localhost:3000` — **tanpa `--incognito`** supaya izin kamera tersimpan (persiapan mode kamera Fase 4).
 - Backup: `npm run backup` (SQLite online backup API → `data/backups/lab-<waktu>.db`), aman dijalankan walau server hidup. Restore & import ulang Excel: lihat README.

@@ -64,7 +64,7 @@ npm ci --omit=dev                          # 1. pasang dependensi
 copy .env.example .env                     # 2. salin konfigurasi, lalu isi
 npm run import -- <file-data-mahasiswa.xlsx>   # 3. (opsional) isi database kosong
 powershell -ExecutionPolicy Bypass -File scripts\setup-system.ps1    # 4. SETELAH UAC: layar nyala terus, PC tidak sleep, Update tidak reboot sendiri
-powershell -ExecutionPolicy Bypass -File scripts\setup-task.ps1      # 5. Task Scheduler: jalankan start.bat saat logon (+restart otomatis bila gagal)
+powershell -ExecutionPolicy Bypass -File scripts\setup-task.ps1      # 5. Task Scheduler: server saat logon (+restart gagal) & BACKUP HARIAN jam 17:00
 powershell -ExecutionPolicy Bypass -File scripts\setup-shortcut.ps1  # 6. shortcut browser mode kiosk di shell:startup
 shutdown /r /t 0                                              # 7. uji: restart PC, semuanya harus hidup sendiri
 ```
@@ -83,6 +83,7 @@ npm run backup -- D:\backup    # simpan ke folder lain (flashdisk/disk eksternal
 ```
 - Backup memakai *SQLite online backup API* → **aman dijalankan walau server kiosk masih hidup**, hasilnya selalu konsisten (termasuk antrian log yang belum terkirim).
 - Tiap backup diverifikasi `integrity_check` sebelum dinyatakan sukses.
+- **Backup terjadwal otomatis**: langkah 5 pemasangan (`setup-task.ps1`) juga mendaftarkan task `LabScanKTM-Backup` → backup harian **jam 17:00**, menyisakan **30 file terakhir**, hasil tercatat di `logs/backup.log`. Ubah jadwal/jumlah dengan `-BackupHour 18` / `-BackupKeep 60` (lihat juga `-WhatIf` dan `-Remove`).
 
 Pemulihan (misal database rusak/PC diganti):
 1. Matikan server (hentikan proses node / cabut shortcut kiosk).
