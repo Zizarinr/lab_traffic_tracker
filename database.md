@@ -34,6 +34,7 @@ Alasan menyalin nama/kelas/semester ke `scan_log`: riwayat tetap akurat walau da
 - NIM selalu dibaca sebagai **teks** (hindari Excel mengubah jadi angka/notasi ilmiah atau menghapus angka nol di depan). Trim spasi.
 - Baris tanpa NIM atau nama dilewati dan dilaporkan.
 - Strategi: upsert (`INSERT ... ON CONFLICT(nim) DO UPDATE`) dalam satu transaksi. Tidak menghapus mahasiswa yang tidak ada di file kecuali dengan opsi `--replace`.
+- **Pengaman `--replace`**: file yang tidak berisi baris valid (0 baris) **ditolak** — mode ini tidak boleh pernah mengosongkan seluruh tabel dari file kosong/salah.
 - Setelah import, cetak ringkasan: jumlah baris dibaca, ditambah, diperbarui, dilewati (beserta nomor baris).
 
 ## Retensi

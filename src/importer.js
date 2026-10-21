@@ -132,14 +132,19 @@ function importExcel(db, filePath, options = {}) {
 
     if (replace) {
       // Hapus mahasiswa yang tidak ada di file.
-      const placeholders = items.map(() => '?').join(',');
+      // Pengaman: file tanpa baris valid TIDAK BOLEH mengosongkan seluruh tabel
+      // (kecelakaan seperti ini pernah terjadi: --replace + file kosong = data hilang).
       if (items.length === 0) {
-        db.prepare('DELETE FROM mahasiswa').run();
-      } else {
-        db.prepare(`DELETE FROM mahasiswa WHERE nim NOT IN (${placeholders})`).run(
-          ...items.map((item) => item.nim)
+        throw new Error(
+          'Mode --replace dibatalkan: file tidak berisi baris valid sama sekali. ' +
+            'Mengosongkan seluruh data mahasiswa dari file kosong tidak diizinkan. ' +
+            'Periksa kembali file Excel-nya (header nim/nama + minimal satu baris data).'
         );
       }
+      const placeholders = items.map(() => '?').join(',');
+      db.prepare(`DELETE FROM mahasiswa WHERE nim NOT IN (${placeholders})`).run(
+        ...items.map((item) => item.nim)
+      );
     }
   });
 
