@@ -10,13 +10,32 @@ const config = require('./config');
 const { nowIso } = require('./db');
 
 const BACKOFF_BASE_SECONDS = 30;
+const MAX_LOG_BYTES = 1024 * 1024; // 1 MB: dirotasi jadi *.old saat server mulai
+
+/** Rotasi sederhana: sync.log lama diganti *.old agar tidak tumbuh tanpa batas. */
+function rotateIfNeeded(filePath) {
+  try {
+    if (fs.statSync(filePath).size > MAX_LOG_BYTES) {
+      fs.rmSync(`${filePath}.old`, { force: true });
+      fs.renameSync(filePath, `${filePath}.old`);
+    }
+  } catch {
+    /* rotasi gagal bukan alasan sinkronisasi berhenti */
+  }
+}
 
 /** Logger sederhana: tulis ke file dan (opsional) ke console. */
 function createLogger(filePath, { echo = true } = {}) {
   let stream = null;
   if (filePath) {
     fs.mkdirSync(path.dirname(filePath), { recursive: true });
+    rotateIfNeeded(filePath);
     stream = fs.createWriteStream(filePath, { flags: 'a' });
+    // Kegagalan menulis log (disk penuh / file hilang) TIDAK boleh menjatuhkan
+    // proses server: stream dilepas, catatan ke console tetap jalan.
+    stream.on('error', () => {
+      stream = null;
+    });
   }
   return {
     write(line) {

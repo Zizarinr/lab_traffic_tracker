@@ -56,6 +56,10 @@ let syncWorker = null;
 let syncLogger = null;
 
 const server = app.listen(config.port, '127.0.0.1', () => {
+  // Di Node 24 + Express 5 callback ini bisa terpanggil walau bind GAGAL
+  // (server.listening=false); biarkan blok 'error' di bawah yang memberi pesan.
+  if (!server.listening) return;
+
   console.log('Lab Scan KTM siap.');
   console.log(`  URL      : http://127.0.0.1:${config.port}`);
   console.log(`  Lab      : ${config.labName}`);
@@ -78,6 +82,18 @@ const server = app.listen(config.port, '127.0.0.1', () => {
   syncWorker = createSyncWorker({ db, cfg: config, logger: syncLogger });
   syncWorker.start();
   console.log(`  Sync     : aktif -> ${config.monitorUrl} (interval ${config.syncIntervalSeconds}s)`);
+});
+
+// Port sudah terpakai (mis. server lama masih hidup): tulis pesan yang jelas di log,
+// bukan tumpukan error Inggris yang membingungkan petugas.
+server.on('error', (err) => {
+  if (err && err.code === 'EADDRINUSE') {
+    console.error(`GAGAL: port ${config.port} sudah terpakai program lain (kemungkinan server lama masih berjalan).`);
+    console.error('  Bantuan: jalankan "npm run checkup", tutup proses node lama, atau ubah PORT di .env');
+    process.exit(1);
+  }
+  console.error('GAGAL: server tidak bisa dimulai:', err && err.message ? err.message : err);
+  process.exit(1);
 });
 
 function shutdown() {
