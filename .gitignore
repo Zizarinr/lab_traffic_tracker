@@ -8,3 +8,5 @@ data/backups/*
 logs/
 # File kunci sementara buatan Microsoft Excel (jangan di-commit)
 ~$*
+# Folder perkakas AI coding agent (bukan bagian project)
+.qodo/

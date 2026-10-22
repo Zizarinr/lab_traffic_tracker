@@ -28,17 +28,58 @@ Dari nol sampai kiosk jalan di lab:
 Semua bagian disusun **berurutan**. Tiap langkah menyertakan **Kenapa** — supaya jelas apa yang rusak bila langkahnya dilewati.
 
 ## Dokumen
+Semua dokumen desain ada di folder [`docs/`](docs/):
+
 | File | Isi |
 |---|---|
-| requirements.md | Kebutuhan dan batasan |
-| tech.md | Stack, struktur folder, env, deployment Windows |
-| design.md | UI, state layar, perilaku scan |
-| database.md | Skema SQLite dan aturan import Excel |
-| api.md | Endpoint internal dan kontrak ke sistem monitoring |
-| tasks.md | Checklist implementasi bertahap untuk code agent |
+| [ARCHITECTURE.md](docs/ARCHITECTURE.md) | **Cara kerja program**: teknologi, peta file, alur eksekusi dari nol sampai akhir |
+| [requirements.md](docs/requirements.md) | Kebutuhan dan batasan |
+| [tech.md](docs/tech.md) | Stack, spesifikasi teknis, env, deployment Windows |
+| [design.md](docs/design.md) | UI, state layar, perilaku scan |
+| [database.md](docs/database.md) | Skema SQLite dan aturan import Excel |
+| [api.md](docs/api.md) | Endpoint internal dan kontrak ke sistem monitoring |
+| [tasks.md](docs/tasks.md) | Checklist implementasi bertahap untuk code agent |
+
+## Struktur direktori
+```
+traffic_tracker/
+├── server.js              # ENTRY PROGRAM: Express + API scan + worker sinkron
+├── start.bat              # entry deployment (Task Scheduler): node server.js + log ke logs/server.log
+├── backup.bat             # entry backup terjadwal (Task Scheduler 17:00)
+├── package.json           # dependensi + daftar npm start/import/backup/checkup/mock/fixture
+├── .env.example           # templat konfigurasi — disalin jadi .env
+│
+├── src/                   # LOGIKA SERVER (hidup tiap kali program jalan)
+│   ├── config.js          #   baca & validasi .env
+│   ├── db.js              #   buat/kelola database SQLite (mode WAL)
+│   ├── scan.js            #   otak satu scan: validasi NIM, cari, debounce, catat log
+│   ├── importer.js        #   logika impor Excel (upsert + pengaman --replace)
+│   └── sync.js            #   worker kirim log synced=0 ke monitoring (backoff saat gagal)
+│
+├── public/                # TAMPILAN KIOSK — dijalankan di browser
+│   ├── index.html         #   semua state layar (standby/berhasil/tidak terdaftar/b error)
+│   ├── style.css          #   gaya flat sesuai design.md
+│   └── app.js             #   jam, deteksi scanner, mesin state, panggil API
+│
+├── scripts/               # ALAT OPERASI (sesekali — bukan tiap boot)
+│   ├── import-excel.js    #   CLI impor (npm run import)
+│   ├── checkup.js         #   diagnosis satu perintah (npm run checkup)
+│   ├── backup.js          #   backup database (npm run backup)
+│   ├── make-fixture.js    #   buat Excel contoh (npm run fixture)
+│   ├── mock-monitor.js    #   monitoring tiruan untuk uji Fase 2 (npm run mock)
+│   ├── setup-system.ps1   #   setelan Windows: anti-sleep, anti-reboot Update
+│   ├── setup-task.ps1     #   daftarkan 2 task Task Scheduler
+│   └── setup-shortcut.ps1 #   shortcut browser kiosk saat logon
+│
+├── fixtures/              # data contoh (mahasiswa-sample.xlsx)
+├── data/                  # lab.db + backups/ — dijalankan program, TIDAK di-commit
+├── logs/                  # server.log, sync.log, backup.log (*.old = hasil rotasi >1 MB)
+└── docs/                  # dokumen desain (lihat tabel Dokumen di atas)
+```
+Yang runtime hanya `server.js` + `src/` + `public/` — PC lab cukup "Node.js + folder ini" untuk hidup. Detail penjelasan per file dan alur eksekusinya ada di [ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## Urutan kerja (untuk AI coding agent)
-Kerjakan `tasks.md` berurutan. Selesaikan dan uji Fase 1 (tanpa jaringan) sebelum menyentuh Fase 2 (sinkronisasi).
+Kerjakan [`docs/tasks.md`](docs/tasks.md) berurutan. Selesaikan dan uji Fase 1 (tanpa jaringan) sebelum menyentuh Fase 2 (sinkronisasi).
 
 ---
 

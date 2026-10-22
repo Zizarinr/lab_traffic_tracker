@@ -1,7 +1,7 @@
 'use strict';
 
 // Worker sinkronisasi: kirim log scan (`synced = 0`) ke sistem monitoring.
-// Aturan mengikuti api.md: batch, timeout, backoff, dan penandaan `synced`.
+// Aturan mengikuti docs/api.md: batch, timeout, backoff, dan penandaan `synced`.
 // Sinkronisasi berjalan asinkron dan tidak pernah memblokir proses scan.
 
 const fs = require('node:fs');
@@ -77,7 +77,7 @@ function markSynced(db, ids, syncedAt) {
   return run(ids);
 }
 
-/** Susun payload sesuai kontrak di api.md. */
+/** Susun payload sesuai kontrak di docs/api.md. */
 function buildPayload(labName, records, sentAt) {
   return {
     lab: labName,

@@ -32,6 +32,7 @@ lab-scan/
     setup-task.ps1     # daftarkan Task Scheduler (start.bat saat logon + restart gagal)
     setup-shortcut.ps1 # shortcut browser kiosk di shell:startup
     setup-system.ps1   # setelan Windows: layar nyala, tanpa sleep, anti-reboot Update
+  docs/                  # dokumen desain (termasuk ARCHITECTURE.md: cara kerja program)
   fixtures/
     mahasiswa-sample.xlsx  # contoh data uji import
   data/
@@ -68,7 +69,7 @@ MONITOR_TOKEN=
 - Jam dan zona waktu: simpan ISO 8601 dengan offset +07:00.
 
 ## Deployment Windows
-Instalasi sekali jalan di PC lab (rincian di `README.md` bagian "Deployment Windows"):
+Instalasi sekali jalan di PC lab (rincian di `../README.md` bagian "Pemasangan di PC lab"):
 - `start.bat`: entry deployment; output server dicatat ke `logs/server.log`.
 - `scripts/setup-system.ps1`: matikan sleep/screen-off (`powercfg`) dan cegah Windows Update me-reboot sendiri (registri `NoAutoRebootWithLoggedOnUsers` + jam aktif). Jalankan sebagai admin.
 - `scripts/setup-task.ps1`: mendaftarkan 2 task Task Scheduler — server (trigger "At log on" → `start.bat`, restart otomatis saat gagal 3×/1 menit) dan **backup harian** (`LabScanKTM-Backup`, `backup.bat --keep=30` jam 17:00, log ke `logs/backup.log`).
