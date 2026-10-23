@@ -15,6 +15,49 @@ Scanner USB (keyboard-wedge) -> Browser kiosk -> POST /api/scan
    -> (tiap 5 menit) worker kirim log synced=0 ke API monitoring
 ```
 
+## Lokasi & alur penyimpanan data
+
+Intinya: **`data/lab.db` adalah sumber kebenaran. Yang dikirim ke sistem monitoring cuma *salinan* JSON, bukan file databasenya. Backup adalah *snapshot konsisten* terpisah dari file yang sama.**
+
+### 1. Dari awal: import data mahasiswa
+| Kejadian | Lokasi | Keterangan |
+|---|---|---|
+| **File Excel sumber** | Bebas (mis. `fixtures/mahasiswa-sample.xlsx` atau file lain) | Hanya dibaca sekali saat `npm run import`. File Excel **tidak disalin** ke dalam folder aplikasi. |
+| **Proses import** | `scripts/import-excel.js` → `src/importer.js` | Membaca kolom `nim`, `nama`, `semester`, `kelas`. NIM dipaksa jadi teks (aman buat awalan `0` & NIM panjang). |
+| **Hasil import** | `data/lab.db` (tabel `mahasiswa`) | Diupsert dalam 1 transaksi. File `lab.db` dibuat otomatis oleh `src/db.js` kalau belum ada. |
+
+### 2. Saat program sedang berjalan (runtime)
+| Item | Lokasi | Keterangan |
+|---|---|---|
+| **Database utama** | `data/lab.db` | **Sumber kebenaran.** Semua hasil scan dicatat ke tabel `scan_log`. Baik **online maupun offline**, fungsi inti (scan, cari, sambutan) tetap jalan 100%. |
+| **File sementara SQLite (WAL/SHM)** | `data/lab.db-wal`, `data/lab.db-shm` | Dibentuk otomatis oleh SQLite saat mode WAL ada proses write. Biasanya muncul sesaat lalu mengecil/hilang. **Jangan dihapus saat server masih hidup.** |
+| **Log aplikasi** | `logs/server.log`, `logs/sync.log`, `logs/backup.log` | Catatan event, hasil worker sync, dan hasil backup. Akan dirotasi jadi `*.log.old` bila ukurannya > 1 MB. |
+| **Frontend (browser kiosk)** | Memori browser | `public/` hanya disajikan statis oleh server. Browser **tidak** punya salinan database, hanya mengirim `POST /api/scan` ke server. |
+
+### 3. Sinkronisasi ke sistem monitoring (tiap 5 menit)
+Interval ini diatur oleh `.env`: `SYNC_INTERVAL_SECONDS=300`. **Bukan backup, cuma pengiriman antrian.**
+
+| Kejadian | Lokasi | Keterangan |
+|---|---|---|
+| **Ambil antrian** | Dibaca dari `data/lab.db` (`scan_log` WHERE `synced=0`) | Worker di `src/sync.js` mengambil batch (maks `SYNC_BATCH_SIZE=100`) berurutan. |
+| **Kirim** | **Hanya salinan** dikirim via HTTP `POST` ke `MONITOR_URL` (+ `MONITOR_TOKEN`) | Yang dikirim adalah JSON berisi data log. **File `data/lab.db` TIDAK dipindahkan/dihapus.** |
+| **Tandai terkirim** | Di-update di `data/lab.db` → `synced=1` | Hanya log yang **benar-benar diakui** oleh monitoring yang ditandai. Kalau gagal, timeout, atau koneksi putus, `synced` tetap `0` lalu akan dicoba ulang dengan **backoff**. |
+| **Offline** | Tetap di `data/lab.db` | Kalau jaringan mati, seluruh backlog aman tersimpan. Begitu jaringan kembali, antrian akan terkirim berurutan tanpa kehilangan data. |
+
+### 4. Backup (manual & terjadwal)
+Backup ini **salinan snapshot konsisten** dari database, terpisah dari proses sync.
+
+| Cara | Kapan | Lokasi simpan | Keterangan |
+|---|---|---|---|
+| **Manual** | Kapan saja (`npm run backup`) | `data/backups/lab-YYYYMMDD-HHMMSS.db` | Bisa diarahkan ke folder lain, contoh: `npm run backup -- D:\backup`. |
+| **Terjadwal** | Otomatis **harian jam 17:00** (Task `LabScanKTM-Backup`) | `data/backups/lab-YYYYMMDD-HHMMSS.db` | Dijalankan `backup.bat` → `scripts/backup.js`. Menggunakan **SQLite Online Backup API**, aman dijalankan **sambil server masih hidup**. Setiap backup dicek `integrity_check`, lalu dipangkas otomatis (`--keep=30`). |
+
+### Ringkasan cepat
+- **Selama berjalan:** Semua data operasional berada di `data/lab.db` (offline-first).
+- **Sync 5 menit:** **Bukan pemindahan data.** Cuma kirim salinan + ubah flag `synced` di file yang sama.
+- **Backup harian:** **Buat salinan terpisah** (`data/backups/`) untuk jaga-jaga kalau file utama rusak/terhapus.
+- **Online/Offline:** Bedanya cuma "apakah ada yang bisa dikirim". Kalau offline, data tetap aman 100% di lokal.
+
 ## Peta jalan
 Dari nol sampai kiosk jalan di lab:
 
