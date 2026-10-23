@@ -28,6 +28,7 @@ lab-scan/
     checkup.js         # npm run checkup: diagnosis cepat satu perintah
     make-fixture.js    # buat fixtures/mahasiswa-sample.xlsx untuk uji
     mock-monitor.js    # server monitoring tiruan untuk uji Fase 2
+    export-xlsx.js     # export log scan -> laporan Excel (read-only)
     backup.js          # backup database (online backup API, aman saat server jalan)
     setup-task.ps1     # daftarkan Task Scheduler (start.bat saat logon + restart gagal)
     setup-shortcut.ps1 # shortcut browser kiosk di shell:startup
@@ -38,6 +39,7 @@ lab-scan/
   data/
     lab.db             # dibuat otomatis, jangan di-commit
     backups/           # hasil npm run backup, jangan di-commit
+  reports/             # hasil npm run report (XLSX), jangan di-commit
   logs/
     sync.log           # catatan status sinkronisasi, jangan di-commit
     server.log         # log start.bat (deployment), jangan di-commit
@@ -79,3 +81,4 @@ Instalasi sekali jalan di PC lab (rincian di `../README.md` bagian "Pemasangan d
 - Auto-logon: task server berpemicu "saat logon" → Windows harus login otomatis (panduan `netplwiz` di README langkah 7) supaya kios hidup sendiri setelah mati listrik.
 - Bila port terpakai: server mencetak `GAGAL: port ... sudah terpakai` (dengan petunjuk `npm run checkup`) lalu keluar kode 1 — task mencoba lagi 3×/1 menit. Catatan Node 24 + Express 5: callback `app.listen` bisa terpanggil walau bind gagal; diblokir dengan cek `server.listening` agar banner "siap" tidak muncul keliru.
 - Diagnosis: `npm run checkup` memeriksa config, DB, server, log, backup, dan task Windows dalam satu perintah (lihat README bagian "Diagnosis cepat").
+- Laporan: `npm run report` mengekspor `scan_log` ke `reports/*.xlsx` (3 sheet: ringkasan harian, semua scan, rekap per mahasiswa). Koneksi **read-only** — aman dijalankan saat server hidup; opsi `--from`/`--to`/`--out`.

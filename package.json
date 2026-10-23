@@ -9,7 +9,8 @@
     "fixture": "node scripts/make-fixture.js",
     "import": "node scripts/import-excel.js",
     "backup": "node scripts/backup.js",
-    "checkup": "node scripts/checkup.js"
+    "checkup": "node scripts/checkup.js",
+    "report": "node scripts/export-xlsx.js"
   },
   "repository": {
     "type": "git",

@@ -56,6 +56,7 @@ Backup ini **salinan snapshot konsisten** dari database, terpisah dari proses sy
 - **Selama berjalan:** Semua data operasional berada di `data/lab.db` (offline-first).
 - **Sync 5 menit:** **Bukan pemindahan data.** Cuma kirim salinan + ubah flag `synced` di file yang sama.
 - **Backup harian:** **Buat salinan terpisah** (`data/backups/`) untuk jaga-jaga kalau file utama rusak/terhapus.
+- **Laporan Excel:** `npm run report` **hanya membaca** database lalu menulis file baru di `reports/` — database tetap utuh.
 - **Online/Offline:** Bedanya cuma "apakah ada yang bisa dikirim". Kalau offline, data tetap aman 100% di lokal.
 
 ## Peta jalan
@@ -107,6 +108,7 @@ traffic_tracker/
 ├── scripts/               # ALAT OPERASI (sesekali — bukan tiap boot)
 │   ├── import-excel.js    #   CLI impor (npm run import)
 │   ├── checkup.js         #   diagnosis satu perintah (npm run checkup)
+│   ├── export-xlsx.js     #   export laporan Excel dari log (npm run report)
 │   ├── backup.js          #   backup database (npm run backup)
 │   ├── make-fixture.js    #   buat Excel contoh (npm run fixture)
 │   ├── mock-monitor.js    #   monitoring tiruan untuk uji Fase 2 (npm run mock)
@@ -117,6 +119,7 @@ traffic_tracker/
 ├── fixtures/              # data contoh (mahasiswa-sample.xlsx)
 ├── data/                  # lab.db + backups/ — dijalankan program, TIDAK di-commit
 ├── logs/                  # server.log, sync.log, backup.log (*.old = hasil rotasi >1 MB)
+├── reports/               # hasil laporan Excel (npm run report), TIDAK di-commit
 └── docs/                  # dokumen desain (lihat tabel Dokumen di atas)
 ```
 Yang runtime hanya `server.js` + `src/` + `public/` — PC lab cukup "Node.js + folder ini" untuk hidup. Detail penjelasan per file dan alur eksekusinya ada di [ARCHITECTURE.md](docs/ARCHITECTURE.md).
@@ -297,6 +300,18 @@ shutdown /r /t 0
 npm run checkup
 ```
 *Kenapa:* bila terasa aneh (server tidak hidup, data menumpuk, NIM yang seharusnya terdaftar jadi tidak dikenal), perintah ini memeriksa semuanya sekaligus: konfigurasi `.env`, integritas + hitungan database, status server, isi akhir file log, backup terbaru, task Windows, dan 5 scan terakhir — lalu menyimpulkan **SEHAT** atau menandai masalahnya dengan ❌. Aman dijalankan kapan saja (hanya membuka database, tanpa mengubah data).
+
+### Buat laporan Excel dari log scan
+```
+npm run report                                          # semua data yang ada
+npm run report -- --from 2026-10-22 --to 2026-10-24     # rentang tanggal (WIB)
+npm run report -- --out D:\laporan\lab-oktober.xlsx     # tentukan lokasi file
+```
+*Kenapa:* layar kiosk hanya menampilkan angka **hari ini**; untuk rekap mingguan/bulanan, log di-export jadi Excel berisi 3 sheet: **Ringkasan Per Hari** (hadir, tidak terdaftar, total, mahasiswa unik), **Semua Scan** (audit lengkap + status terkirim), dan **Rekap Per Mahasiswa** (jumlah kunjungan, scan pertama/terakhir).
+
+- **Aman dijalankan walau server kiosk hidup:** database dibuka *read-only* — tidak ada data yang ditulis atau diubah.
+- Hasil tersimpan di `reports/` dan **tidak di-commit** (berisi data kehadiran).
+- Kolom **Terkirim ke monitoring = Belum** menandakan log yang masih menunggu sinkronisasi; berubah **Ya** setelah diterima sistem monitoring.
 
 ### Backup
 ```

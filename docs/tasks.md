@@ -62,6 +62,8 @@
   - Rotasi log >1 MB → `*.log.old` (`start.bat`, `backup.bat`, `sync.log` saat server mulai). Kegagalan tulis log (disk penuh/file hilang) ditahan — stream dilepas, server tidak ikut crash. Uji: 8/8 (server) + 7/7 (backup).
   - Pesan jelas `GAGAL: port ... sudah terpakai` alih-alih stack trace; callback `listen` yang ikut terpanggil walau bind gagal (quirk Node 24 + Express 5) diabaikan via cek `server.listening` agar banner/sync tidak menyesatkan. Uji jalur gagal+sukses: 10/10.
 
+- [x] 3.10 (Baru) Export laporan Excel: `npm run report` (`scripts/export-xlsx.js`) membaca `scan_log` dengan koneksi **read-only** lalu menulis 3 sheet (Ringkasan Per Hari, Semua Scan, Rekap Per Mahasiswa) ke `reports/*.xlsx`. Opsi `--from`/`--to`/`--out`. Aman dijalankan saat server hidup; `reports/` di-gitignore karena berisi data kehadiran.
+
 ## Fase 4: Backlog (setelah hardware & sistem monitoring siap)
 - [ ] 4.1 Mode kamera (jalur A: **decode barcode/QR, bukan OCR**): flag `INPUT_MODE=scanner|camera|manual`, module `public/camera.js` (getUserMedia + decoder lokal di `public/vendor/`, tanpa CDN), hasil decode masuk `submitScan()` yang sama. Server/DB/sync: nol perubahan.
 - [ ] 4.2 Uji kamera: kecepatan decode vs N4 (<300 ms), akurasi di cahaya lab asli, izin tersimpan di profile `LabKiosk`.

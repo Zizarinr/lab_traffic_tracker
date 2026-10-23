@@ -10,3 +10,5 @@ logs/
 ~$*
 # Folder perkakas AI coding agent (bukan bagian project)
 .qodo/
+# Hasil export laporan (berisi data kehadiran — jangan di-commit)
+reports/

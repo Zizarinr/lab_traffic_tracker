@@ -41,6 +41,7 @@ Dokumen ini menjelaskan **teknologi, struktur file, dan alur eksekusi** program 
 | `backup.bat` → `scripts/backup.js` | Backup terjadwal: online backup API + integrity check + keep-N |
 | `scripts/import-excel.js` | CLI impor — menerima argumen file, memanggil `src/importer.js` |
 | `scripts/checkup.js` | Diagnosis satu perintah `npm run checkup` |
+| `scripts/export-xlsx.js` | Export log scan ke laporan Excel `npm run report` (koneksi read-only) |
 | `scripts/make-fixture.js` | Buat Excel contoh untuk uji |
 | `scripts/mock-monitor.js` | Server monitoring tiruan untuk uji Fase 2 |
 | `scripts/setup-system.ps1` | Setelan Windows anti-sleep/anti-reboot (sekali jalan) |
@@ -163,8 +164,23 @@ Bedanya dengan copy-paste biasa: `db.backup()` mengambil snapshot konsisten **ta
 | `npm run import -- file.xlsx` | `scripts/import-excel.js` → `src/importer.js` | SheetJS baca **sheet pertama** → wajib kolom `nim`/`nama` → angka dikonversi jadi teks (anti notasi ilmiah, leading-zero aman) → **satu transaksi upsert** → pengaman: `--replace` + file 0 baris = **ditolak** |
 | `npm run checkup` | `scripts/checkup.js` | Baca config → buka DB (integritas + hitungan) → probe port/health → ukur & tail log → verifikasi backup terbaru → cek 2 task Windows → 5 scan terakhir → ringkasan SEHAT/❌ |
 | `npm run backup` | `scripts/backup.js` | Online backup + integrity + keep-N (lihat bagian 6) |
+| `npm run report` | `scripts/export-xlsx.js` | `SELECT` dari `scan_log` (**read-only**, opsi `--from`/`--to`/`--out`) → 3 sheet XLSX di `reports/` |
 | `npm run mock` | `scripts/mock-monitor.js` | Server port 4000 yang mode-nya bisa disetel (`POST /control/mode`) |
 | `setup-*.ps1` | script PowerShell masing-masing | **Tidak bagian runtime sama sekali** — sekali jalan saat pemasangan |
+
+### Alur export laporan (`npm run report`)
+
+```
+data/lab.db ──(dibuka READ-ONLY / query_only)──→ SELECT scan_log
+   │ opsional filter --from/--to (tanggal WIB)
+   ▼
+3 sheet: Ringkasan Per Hari | Semua Scan | Rekap Per Mahasiswa
+   ▼
+reports/laporan-traffic-<YYYYMMDD-HHMMSS>.xlsx
+   (database TIDAK berubah — hanya dibaca)
+```
+
+Tidak ada worker/timer: script berjalan sekali, selesai, lalu keluar. Aman dijalankan **sambil server kiosk hidup** karena tidak pernah menulis ke database.
 
 ## 8. Ringkasan 5 kalimat untuk hafal
 
