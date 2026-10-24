@@ -67,7 +67,7 @@ Dari nol sampai kiosk jalan di lab:
 | 1 | [Jalankan di laptop (uji cepat)](#1-menjalankan-di-laptop-uji-cepat-fase-1) | pengembangan & uji tanpa hardware |
 | 2 | [Uji sinkronisasi (mock monitor)](#2-uji-sinkronisasi-fase-2-dengan-mock-monitor) | sebelum sistem monitoring asli siap |
 | 3 | [Pemasangan di PC lab (produksi)](#3-pemasangan-di-pc-lab-fase-3-produksi) | sekali jalan — **ikuti urutannya** |
-| 4 | [Operasi harian & darurat](#4-operasi-harian--darurat) | checkup, backup, pemulihan, import ulang |
+| 4 | [Operasi harian & darurat](#4-operasi-harian--darurat) | checkup, laporan Excel, backup, pemulihan, import ulang |
 
 Semua bagian disusun **berurutan**. Tiap langkah menyertakan **Kenapa** — supaya jelas apa yang rusak bila langkahnya dilewati.
 
@@ -77,6 +77,7 @@ Semua dokumen desain ada di folder [`docs/`](docs/):
 | File | Isi |
 |---|---|
 | [ARCHITECTURE.md](docs/ARCHITECTURE.md) | **Cara kerja program**: teknologi, peta file, alur eksekusi dari nol sampai akhir |
+| [TESTING.md](docs/TESTING.md) | **Checklist uji semua fitur** di PC lab (berlaku untuk semua PC yang kompatibel) |
 | [requirements.md](docs/requirements.md) | Kebutuhan dan batasan |
 | [tech.md](docs/tech.md) | Stack, spesifikasi teknis, env, deployment Windows |
 | [design.md](docs/design.md) | UI, state layar, perilaku scan |
@@ -285,6 +286,8 @@ shutdown /r /t 0
 2. Browser kiosk terbuka sendiri menampilkan layar standby → shortcut + task bekerja.
 3. Scan NIM uji → muncul sambutan dan tercatat.
 4. `npm run checkup` → hasil **SEHAT** (tanpa ❌).
+
+Untuk pengujian menyeluruh (semua fitur, termasuk sinkronisasi dengan mock dan ketahanan), pakai checklist siap-centang: **[docs/TESTING.md](docs/TESTING.md)** — berlaku di PC mana pun yang memenuhi syarat kompatibilitasnya.
 
 **Catatan:**
 - Script langkah 4–6 punya mode `-WhatIf` (lihat rencana tanpa menjalankan); langkah 4 juga `-Info`.

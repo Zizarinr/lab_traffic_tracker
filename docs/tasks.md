@@ -10,6 +10,7 @@
 - [x] 1.7 (Tambahan) Mode input manual untuk uji tanpa scanner: `MANUAL_INPUT=true` menampilkan NIM yang diketik di layar + petunjuk, `Backspace`/`Delete` hapus 1 karakter, `Escape` bersihkan. Scanner keyboard-wedge tetap jalan normal saat mode ini `false`.
 
 ### Uji Fase 1 (semua tanpa internet, cabut kabel/WiFi saat menguji)
+> Checklist siap-centang: `TESTING.md` bagian A–C.
 - [ ] NIM valid -> sambutan benar (nama, kelas, semester), log tersimpan.
 - [ ] NIM tidak ada -> pesan tidak terdaftar, log `not_found` tersimpan.
 - [ ] Scan NIM yang sama berulang cepat -> hanya satu log.
@@ -25,6 +26,7 @@
 - [x] 2.3 Aktifkan lewat `SYNC_ENABLED=true`, konfigurasi dari `.env`.
 
 ### Uji Fase 2
+> Checklist mock lengkap (semua mode gagal/sukses): `TESTING.md` bagian E.
 - [x] Mock aktif -> log terkirim dan `synced=1`.
 - [x] Mock mati/timeout -> log tetap `synced=0`, scan tetap lancar, retry dengan backoff.
 - [x] Mock hidup kembali -> semua backlog terkirim berurutan.
@@ -40,7 +42,7 @@
 - [x] 3.2 Shortcut browser kiosk di `shell:startup`. → `scripts/setup-shortcut.ps1` (deteksi Chrome→Brave→Edge→Helium; `--kiosk` + profile `LabKiosk`, tanpa incognito, izin kamera siap Fase 4)
 - [x] 3.3 Nonaktifkan sleep, screen-off, dan reboot otomatis Windows Update di jam ramai. → `scripts/setup-system.ps1` (`-Info` cek tanpa admin, default = terapkan + auto-UAC, jam aktif 07:00–21:00). ⚠️ Jalankan di PC LAB (mesin dev sengaja tidak diubah: masih sleep 15 mnt / layar 5 mnt)
 - [x] 3.4 Prosedur backup `data/lab.db` dan cara import ulang Excel (dokumentasikan di README). → `scripts/backup.js` (SQLite online backup API, aman saat server jalan, verifikasi `integrity_check`, `--keep=N`) + npm `backup` + README (deployment, backup/pemulihan, import ulang)
-- [ ] 3.5 Uji akhir: nyalakan PC dari kondisi mati, semuanya hidup sendiri tanpa tindakan manual. (checklist di README bagian "Deployment Windows"; jalankan di PC lab) Prasyarat: **auto-logon Windows** (langkah 7 README, `netplwiz`) — tanpa ini task tidak jalan saat boot.
+- [ ] 3.5 Uji akhir: nyalakan PC dari kondisi mati, semuanya hidup sendiri tanpa tindakan manual. (checklist di README bagian "Pemasangan di PC lab"; jalankan di PC lab) Prasyarat: **auto-logon Windows** (langkah 7 README, `netplwiz`) — tanpa ini task tidak jalan saat boot. Checklist lengkap: `TESTING.md` bagian F.
 - [x] 3.6 (Baru) Pengingat status sinkronisasi di layar standby: saat `SYNC_ENABLED=false`, pojok kanan-atas menampilkan `PENGINGAT: SINKRONISASI NONAKTIF — N log menunggu` (amber, flat). `/api/config` kirim `sync_enabled`.
 - [x] 3.7 (Baru) Deteksi otomatis scanner keyboard-wedge: ketikan ≥3 karakter berjarak ≤30 ms = burst scanner → echo/petunjuk mode manual disembunyikan selama burst (berakhir di Enter); ketikan manual berikutnya menampilkannya kembali. Teruji di lapangan dengan scanner asli. `MANUAL_INPUT=false` tetap override keras; fallback bila deteksi meleset.
 
