@@ -1,5 +1,7 @@
 # Tech
 
+> Bagian dari [Lab Scan KTM](../README.md). Cara pakai & pemasangan ada di README; cara kerja program di [ARCHITECTURE.md](ARCHITECTURE.md).
+
 ## Stack
 - Runtime: Node.js LTS (Windows)
 - Server: Express
@@ -11,46 +13,24 @@
 - HTTP client: `fetch` bawaan Node
 
 ## Struktur folder
-```
-lab-scan/
-  server.js            # entry: Express + static + worker
-  src/
-    db.js              # koneksi, skema, query
-    scan.js            # logika scan + debounce
-    importer.js        # import Excel
-    sync.js            # worker sinkronisasi (Fase 2)
-  public/
-    index.html
-    style.css
-    app.js
-  scripts/
-    import-excel.js    # CLI: node scripts/import-excel.js data.xlsx
-    checkup.js         # npm run checkup: diagnosis cepat satu perintah
-    make-fixture.js    # buat fixtures/mahasiswa-sample.xlsx untuk uji
-    mock-monitor.js    # server monitoring tiruan untuk uji Fase 2
-    export-xlsx.js     # export log scan -> laporan Excel (read-only)
-    backup.js          # backup database (online backup API, aman saat server jalan)
-    setup-task.ps1     # daftarkan Task Scheduler (start.bat saat logon + restart gagal)
-    setup-shortcut.ps1 # shortcut browser kiosk di shell:startup
-    setup-system.ps1   # setelan Windows: layar nyala, tanpa sleep, anti-reboot Update
-  docs/                  # dokumen desain (termasuk ARCHITECTURE.md: cara kerja program)
-  fixtures/
-    mahasiswa-sample.xlsx  # contoh data uji import
-  data/
-    lab.db             # dibuat otomatis, jangan di-commit
-    backups/           # hasil npm run backup, jangan di-commit
-  reports/             # hasil npm run report (XLSX), jangan di-commit
-  logs/
-    sync.log           # catatan status sinkronisasi, jangan di-commit
-    server.log         # log start.bat (deployment), jangan di-commit
-    *.log.old          # hasil rotasi (>1 MB), diganti otomatis saat proses mulai
-  .env
-  start.bat            # entry deployment (server), log ke logs/server.log
-  backup.bat           # entry backup terjadwal, log ke logs/backup.log
-  package.json
+Peta lengkap ada di [README — Lampiran B](../README.md#lampiran-b-struktur-direktori). Ringkasnya:
+
+```text
+traffic_tracker/
+  server.js          # entry: Express + static + worker sinkron
+  src/               # config, db, scan, importer, sync
+  public/            # index.html, style.css, app.js (layar kiosk)
+  scripts/           # CLI operasi + PowerShell setup + mock monitoring
+  fixtures/          # contoh Excel untuk uji import
+  data/              # lab.db + backups/ (runtime, tidak di-commit)
+  logs/              # server.log, sync.log, backup.log (+ *.old)
+  reports/           # hasil npm run report (tidak di-commit)
+  docs/              # dokumen desain (lihat README Lampiran C)
 ```
 
 ## Environment (.env)
+Tabel penjelasan tiap variabel: [README — Bagian 5](../README.md#5-konfigurasi-env).
+
 ```
 PORT=3000
 LAB_NAME=LAB-1
@@ -60,7 +40,7 @@ SYNC_ENABLED=false          # false selama sistem monitoring asli belum siap
 SYNC_INTERVAL_SECONDS=300
 SYNC_BATCH_SIZE=100
 SYNC_TIMEOUT_SECONDS=10
-MONITOR_URL=http://192.168.x.x:PORT/api/lab/traffic
+MONITOR_URL=http://192.168.1.50:8080/api/lab/traffic
 MONITOR_TOKEN=
 ```
 

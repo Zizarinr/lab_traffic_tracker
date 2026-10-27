@@ -1,5 +1,7 @@
 # Testing — Checklist Uji Lab Scan KTM
 
+> Bagian dari [Lab Scan KTM](../README.md).
+
 Checklist ini dipakai untuk menguji **semua fitur** di PC lab. Ditulis agar berlaku di **PC mana pun yang memenuhi syarat kompatibilitas** — tidak bergantung pada merek scanner, browser, atau versi Windows tertentu.
 
 **Prinsip uji:**
@@ -67,7 +69,7 @@ Jalankan `npm start`, buka `http://127.0.0.1:3000`.
 | B3 | NIM berawalan nol (mis. `00123456`) | Tersimpan & bisa discan persis `00123456` (bukan `123456`) | [ ] |
 | B4 | NIM panjang (mis. `442023123456789`) | Tersimpan utuh, bisa discan | [ ] |
 | B5 | File tanpa kolom `nim`/`nama` | Ditolak dengan pesan jelas; database **tidak berubah** | [ ] |
-| B6 | `npm run import -- <file kosong> --replace` | **DITOLAK** (pengaman), data lama tetap utuh | [ ] |
+| B6 | `npm run import -- file-kosong.xlsx --replace` | **DITOLAK** (pengaman), data lama tetap utuh | [ ] |
 
 Setelah B6, jalankan `npm run checkup` — jumlah mahasiswa harus sama seperti sebelum B6.
 
@@ -178,7 +180,7 @@ Jalankan di PC lab **sebagai admin** untuk script setup.
 
 ```bat
 npm ci --omit=dev
-npm run import -- <file.xlsx>
+npm run import -- data-mahasiswa.xlsx
 npm start
 npm run checkup
 npm run backup

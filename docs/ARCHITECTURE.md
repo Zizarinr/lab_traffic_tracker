@@ -1,6 +1,8 @@
 # Architecture — Cara Kerja Lab Scan KTM
 
-Dokumen ini menjelaskan **teknologi, struktur file, dan alur eksekusi** program dari awal sampai akhir: apa yang dieksekusi ketika komputer nyala, apa yang terjadi saat satu KTM discan, dan bagaimana data sampai ke sistem monitoring. Baca berurutan dengan [README](../README.md) (cara pakai) dan [tech.md](tech.md) (spesifikasi teknis).
+> Bagian dari [Lab Scan KTM](../README.md). Cara pakai & operasi ada di README; spesifikasi teknis di [tech.md](tech.md).
+
+Dokumen ini menjelaskan **teknologi, struktur file, dan alur eksekusi** program dari awal sampai akhir: apa yang dieksekusi ketika komputer nyala, apa yang terjadi saat satu KTM discan, dan bagaimana data sampai ke sistem monitoring.
 
 ## 1. Teknologi dan alasannya
 
@@ -84,7 +86,7 @@ PC nyala / user logon
 | # | Yang dijalankan | Tujuan |
 |---|---|---|
 | 1 | Ambil semua elemen DOM (layar, jam, scanner, counter…) | Menyiapkan jangkar tampilan |
-| 2 | `GET /api/config` | Isi nama lab, durasi sambutan, mode manual |
+| 2 | `GET /api/config` | Isi nama lab, durasi sambutan, status sinkronisasi |
 | 3 | Loop jam tiap 1 detik | Jam layar standby |
 | 4 | `GET /api/stats` tiap 60 detik | Counter kunjungan hari ini + pengingat sinkron nonaktif |
 | 5 | Pasang `keydown` listener | Menunggu ketikan scanner → lihat bagian 4 |
@@ -96,7 +98,7 @@ PC nyala / user logon
 Scanner USB (atau ketikan manual)
    │  1. app.js menerima keydown per karakter
    │  2. Deteksi burst: >= 3 karakter berjarak <= 30 ms = scanner
-   │     (Enter disembunyikan; ketikan pelan = manusia → echo tampil)
+   │     (echo & petunjuk disembunyikan selama burst; ketikan pelan = manusia → echo tampil)
    │  3. Enter ditekan → buffer NIM
    ▼
 app.js → fetch POST /api/scan {nim}

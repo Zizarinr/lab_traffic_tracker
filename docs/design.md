@@ -1,5 +1,7 @@
 # Design (UI dan perilaku)
 
+> Bagian dari [Lab Scan KTM](../README.md).
+
 ## Prinsip visual
 - Flat dan solid: **tanpa gradasi, shadow, blur, animasi dekoratif, atau border-radius besar**.
 - Satu warna latar penuh per state, teks kontras tinggi.
@@ -55,11 +57,11 @@ Satu halaman, satu state aktif, layar penuh.
 - Satu `<input>` tersembunyi selalu fokus. Pada event `blur`, fokus dikembalikan.
 - Kumpulkan karakter hingga `Enter`. Bersihkan spasi dan karakter non-digit/alfanumerik di awal-akhir.
 - Karakter dari scanner datang sangat cepat. Jika Enter datang tanpa input, abaikan.
-- Saat state sambutan sedang tampil dan scan baru masuk, state diganti langsung dengan scan terbaru dan timer 3 detik di-reset.
+- Saat state sambutan sedang tampil dan scan baru masuk, state diganti langsung dengan scan terbaru dan timer sambutan di-reset.
 - Jika server tidak merespons, tampilkan state "SISTEM BERMASALAH, hubungi petugas" dan coba lagi otomatis tanpa memblokir.
 
 ## Input otomatis: scanner + manual (tanpa switch)
-- **Dua cara input selalu aktif bersamaan**, tanpa setelan `MANUAL_INPUT`:
+- **Dua cara input selalu aktif bersamaan**, tanpa setelan tambahan:
   - **Scanner keyboard-wedge** mengetik ~2–10 ms/karakter → terdeteksi sebagai **burst scanner**; petunjuk dan echo NIM disembunyikan sampai Enter (layar bersih, tanpa kilatan NIM).
   - **Ketik manual** (mahasiswa tidak membawa KTM / KTM gagal) ~100–300 ms/karakter → NIM tampil besar di tengah layar, dengan petunjuk "KETIK NIM LALU TEKAN ENTER" yang selalu tampil di standby.
 - Deteksi: bila ≥3 karakter berturut-turut berjarak ≤30 ms → burst scanner. Bila ketikan melambat setelah burst (manusia mengambil alih), echo tampil kembali.

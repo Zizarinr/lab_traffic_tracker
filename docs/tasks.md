@@ -1,5 +1,9 @@
 # Tasks (kerjakan berurutan, uji tiap fase sebelum lanjut)
 
+> Bagian dari [Lab Scan KTM](../README.md).
+
+**Urutan kerja untuk AI coding agent:** kerjakan fase berurutan, uji tiap fase sebelum lanjut, dan perbarui dokumen setiap ada fitur atau perubahan perilaku.
+
 ## Fase 1: Fungsi inti, tanpa internet
 - [x] 1.1 Inisialisasi proyek Node, install `express`, `better-sqlite3`, `xlsx`, `dotenv`. `SYNC_ENABLED=false`.
 - [x] 1.2 `src/db.js`: buat skema sesuai `database.md`, aktifkan WAL. → terverifikasi (`journal_mode=WAL`, tabel mahasiswa/scan_log + indeks)
@@ -44,7 +48,7 @@
 - [x] 3.4 Prosedur backup `data/lab.db` dan cara import ulang Excel (dokumentasikan di README). → `scripts/backup.js` (SQLite online backup API, aman saat server jalan, verifikasi `integrity_check`, `--keep=N`) + npm `backup` + README (deployment, backup/pemulihan, import ulang)
 - [ ] 3.5 Uji akhir: nyalakan PC dari kondisi mati, semuanya hidup sendiri tanpa tindakan manual. (checklist di README bagian "Pemasangan di PC lab"; jalankan di PC lab) Prasyarat: **auto-logon Windows** (langkah 7 README, `netplwiz`) — tanpa ini task tidak jalan saat boot. Checklist lengkap: `TESTING.md` bagian F.
 - [x] 3.6 (Baru) Pengingat status sinkronisasi di layar standby: saat `SYNC_ENABLED=false`, pojok kanan-atas menampilkan `PENGINGAT: SINKRONISASI NONAKTIF — N log menunggu` (amber, flat). `/api/config` kirim `sync_enabled`.
-- [x] 3.7 (Baru) Deteksi otomatis scanner keyboard-wedge: ketikan ≥3 karakter berjarak ≤30 ms = burst scanner → echo/petunjuk mode manual disembunyikan selama burst (berakhir di Enter); ketikan manual berikutnya menampilkannya kembali. Teruji di lapangan dengan scanner asli.
+- [x] 3.7 (Baru) Deteksi otomatis scanner keyboard-wedge: ketikan ≥3 karakter berjarak ≤30 ms = burst scanner → echo/petunjuk disembunyikan selama burst (berakhir di Enter); ketikan manual berikutnya menampilkannya kembali. Teruji di lapangan dengan scanner asli.
 
 ### Uji Fase 3
 - [x] `start.bat`: server hidup ~2 detik, output tercatat di `logs/server.log`.
@@ -69,6 +73,6 @@
 - [x] 3.11 (Baru, permintaan lapangan) **Input otomatis tanpa switch**: `MANUAL_INPUT` dihapus dari kode, `.env`, dan dokumentasi. Petunjuk "KETIK NIM LALU TEKAN ENTER" + echo NIM selalu tampil; saat burst scanner terdeteksi keduanya disembunyikan (`body.scanner-burst`), dan bila ketikan melambat (manusia mengambil alih) echo muncul kembali. Petugas tidak perlu mengubah konfigurasi ketika ada mahasiswa tanpa KTM. `/api/config` tidak lagi mengirim `manual_input`; banner server & `checkup` menampilkan "Input: otomatis".
 
 ## Fase 4: Backlog (setelah hardware & sistem monitoring siap)
-- [ ] 4.1 Mode kamera (jalur A: **decode barcode/QR, bukan OCR**): flag `INPUT_MODE=scanner|camera|manual`, module `public/camera.js` (getUserMedia + decoder lokal di `public/vendor/`, tanpa CDN), hasil decode masuk `submitScan()` yang sama. Server/DB/sync: nol perubahan.
+- [ ] 4.1 Mode kamera (jalur A: **decode barcode/QR, bukan OCR**): flag `INPUT_MODE=auto|camera`, module `public/camera.js` (getUserMedia + decoder lokal di `public/vendor/`, tanpa CDN), hasil decode masuk `submitScan()` yang sama. Server/DB/sync: nol perubahan.
 - [ ] 4.2 Uji kamera: kecepatan decode vs N4 (<300 ms), akurasi di cahaya lab asli, izin tersimpan di profile `LabKiosk`.
 - [ ] 4.3 Uji lapangan sisanya Fase 2: putus WiFi sungguhan; sambung ke sistem monitoring asli (butuh kontrak API + URL/token).

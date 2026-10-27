@@ -1,5 +1,7 @@
 # Database (SQLite)
 
+> Bagian dari [Lab Scan KTM](../README.md).
+
 File: `data/lab.db`. Aktifkan `PRAGMA journal_mode = WAL;` dan `PRAGMA synchronous = NORMAL;`.
 
 ## Skema

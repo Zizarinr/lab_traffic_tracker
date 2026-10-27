@@ -1,5 +1,7 @@
 # API
 
+> Bagian dari [Lab Scan KTM](../README.md).
+
 ## A. Endpoint internal (browser kiosk -> server lokal)
 
 ### POST /api/scan

@@ -1,5 +1,7 @@
 # Requirements
 
+> Bagian dari [Lab Scan KTM](../README.md).
+
 ## Konteks
 - PC Windows di depan lab, layar landscape (target 1920x1080).
 - Scanner barcode USB tipe keyboard-wedge (seperti di minimarket): mengetik NIM lalu menekan Enter.
