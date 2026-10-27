@@ -56,7 +56,6 @@ PORT=3000
 LAB_NAME=LAB-1
 DEBOUNCE_SECONDS=10
 WELCOME_SECONDS=2
-MANUAL_INPUT=true           # true selama scanner asli belum ada; false = kiosk murni
 SYNC_ENABLED=false          # false selama sistem monitoring asli belum siap
 SYNC_INTERVAL_SECONDS=300
 SYNC_BATCH_SIZE=100

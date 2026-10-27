@@ -115,11 +115,7 @@ async function main() {
   section('Konfigurasi (.env)');
   report('INFO', 'Port / Lab', `${config.port} / ${config.labName}`);
   report('INFO', 'Debounce / sambutan', `${config.debounceSeconds} dtk / ${config.welcomeSeconds} dtk`);
-  if (config.manualInput) {
-    report('WARN', 'Input manual', 'AKTIF (mode uji) - di PC lab dengan scanner: MANUAL_INPUT=false');
-  } else {
-    report('OK', 'Input manual', 'nonaktif (kiosk murni)');
-  }
+  report('OK', 'Input', 'otomatis (scanner keyboard-wedge + ketik manual)');
   if (config.syncEnabled) {
     if (/^https?:\/\//.test(config.monitorUrl)) {
       report('OK', 'Sinkronisasi', `aktif -> ${config.monitorUrl} (interval ${config.syncIntervalSeconds}s)`);

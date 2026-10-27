@@ -48,7 +48,7 @@ Jalankan `npm start`, buka `http://127.0.0.1:3000`.
 | A3 | Scan NIM yang sama lagi dalam < 10 detik | Berkedip "duplikat"; **tidak** menambah log/counter | [ ] |
 | A4 | Setelah 10 detik, scan NIM yang sama lagi | Tercatat sebagai kunjungan baru (counter bertambah) | [ ] |
 | A5 | Dua NIM berbeda beruntun | Tampilan berganti ke scan terbaru, tidak "nyangkut" | [ ] |
-| A6 | Mode manual (`MANUAL_INPUT=true`): ketik NIM pelan + Enter | Echo NIM tampil saat mengetik; Enter memproses | [ ] |
+| A6 | Ketik NIM pelan + Enter (meniru mahasiswa tanpa KTM) | NIM tampil besar saat diketik; Enter memproses | [ ] |
 | A7 | Mode manual: `Backspace` dan `Escape` | Backspace hapus 1 karakter; Escape bersihkan buffer | [ ] |
 | A8 | Buka `http://127.0.0.1:3000/api/stats` | `today` = jumlah scan `ok` hari ini; `pending_sync` = jumlah log belum terkirim | [ ] |
 | A9 | Restart server (`Ctrl+C` lalu `npm start`) | Data mahasiswa & log tetap ada; counter tidak berubah | [ ] |
@@ -77,9 +77,9 @@ Setelah B6, jalankan `npm run checkup` — jumlah mahasiswa harus sama seperti s
 
 | ID | Langkah | Hasil yang diharapkan | Lulus? |
 |---|---|---|---|
-| C1 | Set `MANUAL_INPUT=false` di `.env`, restart, scan KTM asli | Langsung terproses tanpa echo; tidak ada karakter nyasar di layar | [ ] |
+| C1 | Scan KTM asli (scanner) | Langsung terproses; NIM tidak sempat tampil (echo disembunyikan saat burst) | [ ] |
 | C2 | Scan cepat 3–5 KTM berturut-turut | Semua terproses berurutan, tidak ada yang hilang/tertukar | [ ] |
-| C3 | Ketik manual NIM dengan `MANUAL_INPUT=false` | Ketikan manusia **tidak** mengganggu (deteksi burst scanner) | [ ] |
+| C3 | Ketik NIM pelan (tanpa KTM) saat standby | NIM tampil di layar; tidak dianggap scanner; Enter memproses | [ ] |
 | C4 | Baca layar dari jarak 1–2 m | Nama & status terbaca jelas | [ ] |
 | C5 | Scan saat layar sambutan masih tampil | Tetap diproses (tidak "menunggu" sambutan selesai) | [ ] |
 | C6 | Cabut–pasang scanner | Scanner tetap berfungsi setelah dicolok lagi (keyboard-wedge) | [ ] |
@@ -90,7 +90,7 @@ Setelah B6, jalankan `npm run checkup` — jumlah mahasiswa harus sama seperti s
 
 | ID | Langkah | Hasil yang diharapkan | Lulus? |
 |---|---|---|---|
-| D1 | `npm run checkup` | Ringkasan **SEHAT**; ❌ 0. Kuning `MANUAL_INPUT`/`SYNC_ENABLED` boleh muncul sesuai kondisi | [ ] |
+| D1 | `npm run checkup` | Ringkasan **SEHAT**; ❌ 0. Kuning `SYNC_ENABLED` boleh muncul sesuai kondisi | [ ] |
 | D2 | `npm run report` lalu buka file di `reports\` | 3 sheet: Ringkasan Per Hari, Semua Scan, Rekap Per Mahasiswa; angka cocok dengan `/api/stats` | [ ] |
 | D3 | `npm run report -- --from <hari-ini> --to <hari-ini>` | Hanya data hari itu yang masuk | [ ] |
 | D4 | `npm run backup` | File `lab-YYYYMMDD-HHMMSS.db` baru; `npm run checkup` tetap integritas ok | [ ] |
@@ -167,7 +167,7 @@ Jalankan di PC lab **sebagai admin** untuk script setup.
 ## H. Go-live (menuju pemakaian nyata)
 
 - [ ] **H1** Putuskan nasib data uji. Bila **hanya** berisi data uji: matikan server, hapus `data\lab.db`, `data\lab.db-wal`, `data\lab.db-shm` → start ulang (database baru), lalu import data asli.
-- [ ] **H2** Set `.env` produksi: `LAB_NAME` benar, `MANUAL_INPUT=false` (scanner terpasang), `SYNC_ENABLED=false` sampai server pusat siap, `SYNC_INTERVAL_SECONDS=300`, `DEBOUNCE_SECONDS=10`.
+- [ ] **H2** Set `.env` produksi: `LAB_NAME` benar, `SYNC_ENABLED=false` sampai server pusat siap, `SYNC_INTERVAL_SECONDS=300`, `DEBOUNCE_SECONDS=10`. (Input scanner/manual otomatis — tidak ada switch.)
 - [ ] **H3** `npm run checkup` → tanpa ❌; task Windows **terdaftar**; backup terbaru valid.
 - [ ] **H4** Isi *Lembar Hasil* di bawah dan simpan salinan checklist ini.
 - [ ] **H5** Saat server pusat siap: isi `MONITOR_URL` + `MONITOR_TOKEN` asli, set `SYNC_ENABLED=true`, restart → pastikan `logs\sync.log` mencatat SUKSES dan `pending_sync` menyusut.
@@ -198,8 +198,8 @@ shutdown /r /t 0
 |---|---|
 | `npm start` → `GAGAL: port ... terpakai` | Server lama masih hidup; tutup proses `node.exe` atau restart PC |
 | Layar kiosk putih / tidak memuat | Pastikan server hidup (`/api/health`), buka `http://127.0.0.1:3000` |
-| Scanner tidak terbaca | Cek kabel/mode HID; coba `MANUAL_INPUT=true` untuk memastikan aplikasi sehat |
-| Echo karakter muncul padahal scanner | Deteksi burst meleset → set `MANUAL_INPUT=false` (override keras) |
+| Scanner tidak terbaca | Cek kabel/mode HID; ketik NIM manual untuk memastikan aplikasi sehat |
+| Echo NIM muncul saat scan KTM | Scanner mungkin lebih lambat dari 30 ms/karakter; catat merek/tipe scanner dan laporkan untuk penyesuaian ambang |
 | Tidak hidup setelah PC menyala | Cek urutan: auto-logon (F6) → task `LabScanKTM-Server` (F4) → shortcut (F5) |
 | Sync tidak jalan | Mock hidup? `MONITOR_URL` & token benar? lihat `logs\sync.log` |
 | Import 0 baris | Kolom wajib `nim` dan `nama`; sheet pertama yang dibaca |

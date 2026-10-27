@@ -58,9 +58,13 @@ Satu halaman, satu state aktif, layar penuh.
 - Saat state sambutan sedang tampil dan scan baru masuk, state diganti langsung dengan scan terbaru dan timer 3 detik di-reset.
 - Jika server tidak merespons, tampilkan state "SISTEM BERMASALAH, hubungi petugas" dan coba lagi otomatis tanpa memblokir.
 
-## Mode input manual & deteksi scanner (Fase 3)
-- `MANUAL_INPUT=true` (sebelum scanner asli terpasang): NIM yang diketik manusia tampil besar di tengah layar + petunjuk "KETIK NIM LALU TEKAN ENTER". `Backspace`/`Delete` hapus 1 karakter, `Escape` bersihkan.
-- **Deteksi otomatis scanner**: scanner keyboard-wedge mengetik ~2–10 ms/karakter; manusia ~100–300 ms/karakter. Bila ≥3 karakter berturut-turut berjarak ≤30 ms, ketikan dianggap **burst scanner** → petunjuk dan echo disembunyikan sampai Enter (layar bersih, tanpa kilatan NIM). Ketikan **manusia berikutnya menampilkan echo kembali**, jadi mode manual tetap nyaman sebagai cadangan saat KTM gagal discan. `MANUAL_INPUT=false` = kiosk murni sejak awal (echo tidak pernah tampil).
+## Input otomatis: scanner + manual (tanpa switch)
+- **Dua cara input selalu aktif bersamaan**, tanpa setelan `MANUAL_INPUT`:
+  - **Scanner keyboard-wedge** mengetik ~2–10 ms/karakter → terdeteksi sebagai **burst scanner**; petunjuk dan echo NIM disembunyikan sampai Enter (layar bersih, tanpa kilatan NIM).
+  - **Ketik manual** (mahasiswa tidak membawa KTM / KTM gagal) ~100–300 ms/karakter → NIM tampil besar di tengah layar, dengan petunjuk "KETIK NIM LALU TEKAN ENTER" yang selalu tampil di standby.
+- Deteksi: bila ≥3 karakter berturut-turut berjarak ≤30 ms → burst scanner. Bila ketikan melambat setelah burst (manusia mengambil alih), echo tampil kembali.
+- `Backspace`/`Delete` hapus 1 karakter, `Escape` bersihkan buffer.
+- Karena tidak ada mode, petugas tidak perlu mengubah konfigurasi saat ada mahasiswa tanpa KTM.
 
 ## Jam dan counter
 - Jam di pojok standby diperbarui tiap detik dari jam PC.

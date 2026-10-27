@@ -30,7 +30,6 @@ const SCANNER_GAP_MS = 30;
 const SCANNER_MIN_GAPS = 2;
 
 let welcomeSeconds = 3;
-let manualMode = false;
 let syncEnabled = true;
 let pendingSync = 0;
 let scannerBurst = false; // true selama ketikan datang dari scanner (echo disembunyikan)
@@ -90,8 +89,6 @@ async function loadConfig() {
     if (Number.isFinite(data.welcome_seconds) && data.welcome_seconds > 0) {
       welcomeSeconds = data.welcome_seconds;
     }
-    manualMode = data.manual_input === true;
-    document.body.classList.toggle('manual-mode', manualMode);
     syncEnabled = data.sync_enabled !== false;
     renderSyncReminder();
   } catch (err) {
@@ -187,11 +184,9 @@ function focusScanner() {
   }
 }
 
-/** Tampilkan NIM yang sedang diketik di layar (mode manual). */
+/** Tampilkan NIM yang sedang diketik. Disembunyikan selama burst scanner. */
 function renderBuffer() {
-  if (manualMode) {
-    manualInputEl.textContent = buffer;
-  }
+  manualInputEl.textContent = scannerBurst ? '' : buffer;
 }
 
 document.addEventListener('keydown', (event) => {
@@ -201,7 +196,8 @@ document.addEventListener('keydown', (event) => {
     event.preventDefault();
     lastKeyAt = 0; // Enter menutup satu "burst"; deteksi dimulai lagi dari nol.
     fastGaps = 0;
-    scannerBurst = false; // ketikan berikutnya dianggap manusia sampai scanner terdeteksi lagi.
+    scannerBurst = false;
+    document.body.classList.remove('scanner-burst');
     const raw = buffer;
     buffer = '';
     renderBuffer();
@@ -225,10 +221,6 @@ document.addEventListener('keydown', (event) => {
 
   if (event.key.length === 1) {
     noteKeyTiming();
-    // Ketikan manusia: echo/petunjuk tampil kembali (alur cadangan: KTM rusak -> petugas ketik NIM).
-    if (manualMode && !scannerBurst) {
-      document.body.classList.add('manual-mode');
-    }
     if (buffer.length < MAX_BUFFER) {
       buffer += event.key;
       renderBuffer();
@@ -240,19 +232,23 @@ document.addEventListener('keydown', (event) => {
  * Deteksi scanner keyboard-wedge dari kecepatan ketikan.
  * Bila >=SCANNER_MIN_GAPS karakter berturut-turut berjarak <=SCANNER_GAP_MS
  * (mustahil bagi manusia), ketikan dianggap burst scanner dan echo/petunjuk
- * mode manual disembunyikan hingga Enter. Ketikan manusia berikutnya
- * menampilkan echo kembali, jadi mode manual tetap nyaman dipakai sebagai
- * cadangan saat KTM gagal discan. Fallback bila deteksi meleset: MANUAL_INPUT=false.
+ * disembunyikan hingga Enter. Bila ketikan melambat (manusia mengambil alih),
+ * echo tampil kembali — jadi input manual selalu tersedia tanpa perlu setelan.
  */
 function noteKeyTiming() {
   const now = Date.now();
-  fastGaps = lastKeyAt > 0 && now - lastKeyAt <= SCANNER_GAP_MS ? fastGaps + 1 : 0;
+  const gap = lastKeyAt > 0 ? now - lastKeyAt : Number.POSITIVE_INFINITY;
+  fastGaps = gap <= SCANNER_GAP_MS ? fastGaps + 1 : 0;
   lastKeyAt = now;
+
   if (!scannerBurst && fastGaps >= SCANNER_MIN_GAPS) {
     scannerBurst = true;
-    document.body.classList.remove('manual-mode');
-    manualInputEl.textContent = '';
+  } else if (scannerBurst && gap > SCANNER_GAP_MS) {
+    // Ketikan melambat setelah burst: manusia melanjutkan input.
+    scannerBurst = false;
   }
+
+  document.body.classList.toggle('scanner-burst', scannerBurst);
 }
 
 scannerEl.addEventListener('blur', () => {

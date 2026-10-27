@@ -147,13 +147,10 @@ body.sync-off .sync-reminder {
   align-items: center;
 }
 
-/* Mode input manual: tampil hanya bila body punya kelas manual-mode. */
-.manual-hint,
-.manual-input {
-  display: none;
-}
-
-body.manual-mode .manual-hint {
+/* Input manual selalu aktif: petunjuk & echo NIM tampil di layar.
+   Saat burst scanner terdeteksi, keduanya disembunyikan (tetap memakai ruang
+   yang sama agar tata letak tidak bergeser). */
+.manual-hint {
   display: block;
   margin-top: 6vh;
   font-size: 1.6vw;
@@ -161,13 +158,18 @@ body.manual-mode .manual-hint {
   letter-spacing: 0.08em;
 }
 
-body.manual-mode .manual-input {
+.manual-input {
   display: block;
   margin-top: 1.5vh;
   min-height: 1.2em;
   font-size: 6vw;
   font-weight: 700;
   letter-spacing: 0.12em;
+}
+
+body.scanner-burst .manual-hint,
+body.scanner-burst .manual-input {
+  visibility: hidden;
 }
 
 .standby-bottom {

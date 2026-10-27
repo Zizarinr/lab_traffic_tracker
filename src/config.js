@@ -22,10 +22,6 @@ const config = {
   debounceSeconds: toNumber('DEBOUNCE_SECONDS', 10),
   welcomeSeconds: toNumber('WELCOME_SECONDS', 3),
 
-  // Mode bantu: tampilkan NIM yang sedang diketik di layar (untuk input keyboard manual
-  // saat scanner belum tersedia). Scanner keyboard-wedge tetap bekerja normal.
-  manualInput: toText('MANUAL_INPUT', 'false').toLowerCase() === 'true',
-
   syncEnabled: toText('SYNC_ENABLED', 'false').toLowerCase() === 'true',
   syncIntervalSeconds: toNumber('SYNC_INTERVAL_SECONDS', 300),
   syncBatchSize: toNumber('SYNC_BATCH_SIZE', 100),

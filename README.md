@@ -144,9 +144,10 @@ npm install
 ```
 copy .env.example .env
 ```
-*Kenapa:* semua perilaku (port, nama lab, durasi sambutan, debounce, mode uji, sinkronisasi) dibaca dari `.env` **saat server mulai** — dan `.env` tidak ikut ter-copy saat meng-clone repo (sengaja, berisi rahasia). Untuk uji laptop biarkan nilai contoh:
-- `MANUAL_INPUT=true` — ketikan NIM tampil di layar; berguna saat belum ada scanner.
+*Kenapa:* semua perilaku (port, nama lab, durasi sambutan, debounce, sinkronisasi) dibaca dari `.env` **saat server mulai** — dan `.env` tidak ikut ter-copy saat meng-clone repo (sengaja, berisi rahasia). Untuk uji laptop biarkan nilai contoh:
 - `SYNC_ENABLED=false` — sinkronisasi dimatikan sampai ada tujuan (Bagian 2).
+
+> **Input tidak perlu diatur.** Aplikasi selalu menerima dua cara sekaligus: scanner KTM (terdeteksi dari kecepatan ketikan) dan ketikan manual untuk yang tidak membawa KTM. Tidak ada switch yang perlu diubah per orang.
 
 ### Langkah 3 — isi database mahasiswa
 ```
@@ -164,16 +165,19 @@ lalu buka `http://127.0.0.1:3000` di browser.
 *Kenapa:* inilah aplikasinya — Express menyajikan halaman kiosk + API scan di port 3000.
 
 ### Langkah 5 — uji alur scan
-Dengan mode manual di layar:
-- ketik `4420231001` lalu Enter → muncul sambutan nama **BUDI SANTOSO** → kembali standby;
+- ketik `4420231001` pelan lalu Enter → NIM tampil saat diketik, muncul sambutan nama **BUDI SANTOSO**, lalu kembali standby;
 - scan NIM yang sama lagi dalam 10 detik → hanya berkedip "duplikat", **tidak ada log baru**;
 - ketik NIM asing (mis. `999999999`) → layar merah **NOT FOUND**.
 
-Kontrol mode manual: `Backspace` hapus 1 karakter, `Escape` bersihkan.
+Kontrol saat mengetik manual: `Backspace` hapus 1 karakter, `Escape` bersihkan.
 
 *Kenapa:* membuktikan tiga hal sekaligus sebelum lanjut — pencarian NIM, pencatatan log, dan **debounce** (mencegah log dobel saat scanner membaca dua kali atau KTM discan ulang).
 
-Saat scanner asli sudah terpasang: set `MANUAL_INPUT=false` di `.env`, supaya ketikan manusia (mis. petugas mengetik NIM manual) tidak dianggap scan oleh deteksi scanner.
+**Dua cara input berjalan otomatis tanpa setelan:**
+- **Scanner KTM** — karakter datang sangat cepat (≤30 ms/karakter) → layar tetap bersih, NIM tidak ditampilkan; Enter langsung memproses.
+- **Ketik manual** (mis. mahasiswa tidak membawa KTM) — karakter datang pelan → NIM tampil besar di layar, Enter memproses. Petunjuk "KETIK NIM LALU TEKAN ENTER" selalu tampil di layar standby.
+
+Tidak ada `MANUAL_INPUT` yang perlu diubah — perilaku ini berlaku sama untuk semua orang.
 
 Bila ada yang terasa aneh di sepanjang jalan: `npm run checkup` (lihat Bagian 4).
 
@@ -231,7 +235,7 @@ npm ci --omit=dev
 ```
 copy .env.example .env
 ```
-Isi minimal `LAB_NAME`, lalu untuk produksi: `MANUAL_INPUT=false` (scanner asli sudah terpasang) dan `SYNC_ENABLED` sesuai kesiapan monitoring (lihat Bagian 2).
+Isi minimal `LAB_NAME`, lalu untuk produksi: `SYNC_ENABLED` sesuai kesiapan monitoring (lihat Bagian 2). Input scanner/manual **tidak perlu diatur** — keduanya aktif otomatis.
 
 *Kenapa di sini:* server hanya membaca `.env` saat mulai; setelan salah = perilaku salah di lapangan yang sulit ditebak dari luar.
 

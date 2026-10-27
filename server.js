@@ -18,12 +18,11 @@ app.get('/api/health', (req, res) => {
   res.json({ ok: true });
 });
 
-// Konfigurasi yang dibutuhkan UI (nama lab, durasi sambutan, mode input manual).
+// Konfigurasi yang dibutuhkan UI (nama lab, durasi sambutan, status sinkronisasi).
 app.get('/api/config', (req, res) => {
   res.json({
     lab_name: config.labName,
     welcome_seconds: config.welcomeSeconds,
-    manual_input: config.manualInput,
     sync_enabled: config.syncEnabled,
   });
 });
@@ -66,7 +65,7 @@ const server = app.listen(config.port, '127.0.0.1', () => {
   console.log(`  Database : ${DB_PATH}`);
   console.log(`  Debounce : ${config.debounceSeconds} detik`);
   console.log(`  Sambutan : ${config.welcomeSeconds} detik`);
-  console.log(`  Input    : ${config.manualInput ? 'manual (uji)' : 'scanner kiosk'}`);
+  console.log('  Input    : otomatis (scanner keyboard-wedge + ketik manual)');
 
   // Fase 2: worker sinkronisasi.
   if (!config.syncEnabled) {

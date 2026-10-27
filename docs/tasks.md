@@ -7,7 +7,7 @@
 - [x] 1.4 `POST /api/scan` dengan debounce 10 detik dan penyimpanan log. `GET /api/stats`, `GET /api/health`. → terverifikasi (11 pemeriksaan API)
 - [x] 1.5 Halaman kiosk (`public/`): state STANDBY, BERHASIL, TIDAK TERDAFTAR, SISTEM BERMASALAH sesuai `design.md`. Flat, tanpa gradasi/shadow, tanpa aset eksternal.
 - [x] 1.6 Input scanner tersembunyi dengan fokus permanen dan penanganan Enter.
-- [x] 1.7 (Tambahan) Mode input manual untuk uji tanpa scanner: `MANUAL_INPUT=true` menampilkan NIM yang diketik di layar + petunjuk, `Backspace`/`Delete` hapus 1 karakter, `Escape` bersihkan. Scanner keyboard-wedge tetap jalan normal saat mode ini `false`.
+- [x] 1.7 (Tambahan) Mode input manual untuk uji tanpa scanner: NIM yang diketik tampil di layar + petunjuk, `Backspace`/`Delete` hapus 1 karakter, `Escape` bersihkan. Scanner keyboard-wedge tetap jalan normal. (Switch `MANUAL_INPUT` dihapus di 3.11 — kini otomatis penuh.)
 
 ### Uji Fase 1 (semua tanpa internet, cabut kabel/WiFi saat menguji)
 > Checklist siap-centang: `TESTING.md` bagian A–C.
@@ -44,7 +44,7 @@
 - [x] 3.4 Prosedur backup `data/lab.db` dan cara import ulang Excel (dokumentasikan di README). → `scripts/backup.js` (SQLite online backup API, aman saat server jalan, verifikasi `integrity_check`, `--keep=N`) + npm `backup` + README (deployment, backup/pemulihan, import ulang)
 - [ ] 3.5 Uji akhir: nyalakan PC dari kondisi mati, semuanya hidup sendiri tanpa tindakan manual. (checklist di README bagian "Pemasangan di PC lab"; jalankan di PC lab) Prasyarat: **auto-logon Windows** (langkah 7 README, `netplwiz`) — tanpa ini task tidak jalan saat boot. Checklist lengkap: `TESTING.md` bagian F.
 - [x] 3.6 (Baru) Pengingat status sinkronisasi di layar standby: saat `SYNC_ENABLED=false`, pojok kanan-atas menampilkan `PENGINGAT: SINKRONISASI NONAKTIF — N log menunggu` (amber, flat). `/api/config` kirim `sync_enabled`.
-- [x] 3.7 (Baru) Deteksi otomatis scanner keyboard-wedge: ketikan ≥3 karakter berjarak ≤30 ms = burst scanner → echo/petunjuk mode manual disembunyikan selama burst (berakhir di Enter); ketikan manual berikutnya menampilkannya kembali. Teruji di lapangan dengan scanner asli. `MANUAL_INPUT=false` tetap override keras; fallback bila deteksi meleset.
+- [x] 3.7 (Baru) Deteksi otomatis scanner keyboard-wedge: ketikan ≥3 karakter berjarak ≤30 ms = burst scanner → echo/petunjuk mode manual disembunyikan selama burst (berakhir di Enter); ketikan manual berikutnya menampilkannya kembali. Teruji di lapangan dengan scanner asli.
 
 ### Uji Fase 3
 - [x] `start.bat`: server hidup ~2 detik, output tercatat di `logs/server.log`.
@@ -55,7 +55,7 @@
 - [x] UI: 18 pemeriksaan baru lulus (pengingat sync on/off, deteksi scanner vs manusia, reset Enter, regresi kiosk) + 17 pemeriksaan UI lama tetap lulus.
 - [x] Integrasi nyata: `/api/config` → `sync_enabled:false`, halaman memuat elemen `sync-reminder`, log startup `Sync : nonaktif`.
 - [ ] Uji nyala-dari-mati di PC lab (mencakup 3.1–3.3 sekaligus) — oleh petugas.
-- [ ] Set scanner asli terpasang: pastikan echo hilang otomatis (terdeteksi) atau set `MANUAL_INPUT=false` bila perlu.
+- [ ] Set scanner asli terpasang: pastikan echo hilang otomatis saat scan KTM (deteksi burst).
 
 - [x] 3.8 (Baru) Backup terjadwal otomatis: `setup-task.ps1` mendaftarkan task kedua `LabScanKTM-Backup` (harian jam 17:00, `backup.bat --keep=30`, hasil ke `logs/backup.log`). Param `-BackupHour`/`-BackupKeep`. Terverifikasi: task nyata dijalankan via Task Scheduler → file backup bertambah + integrity ok.
 - [x] 3.9 (Baru, pasca evaluasi logika menyeluruh) Peningkatan pemeliharaan:
@@ -65,6 +65,8 @@
   - Pesan jelas `GAGAL: port ... sudah terpakai` alih-alih stack trace; callback `listen` yang ikut terpanggil walau bind gagal (quirk Node 24 + Express 5) diabaikan via cek `server.listening` agar banner/sync tidak menyesatkan. Uji jalur gagal+sukses: 10/10.
 
 - [x] 3.10 (Baru) Export laporan Excel: `npm run report` (`scripts/export-xlsx.js`) membaca `scan_log` dengan koneksi **read-only** lalu menulis 3 sheet (Ringkasan Per Hari, Semua Scan, Rekap Per Mahasiswa) ke `reports/*.xlsx`. Opsi `--from`/`--to`/`--out`. Aman dijalankan saat server hidup; `reports/` di-gitignore karena berisi data kehadiran.
+
+- [x] 3.11 (Baru, permintaan lapangan) **Input otomatis tanpa switch**: `MANUAL_INPUT` dihapus dari kode, `.env`, dan dokumentasi. Petunjuk "KETIK NIM LALU TEKAN ENTER" + echo NIM selalu tampil; saat burst scanner terdeteksi keduanya disembunyikan (`body.scanner-burst`), dan bila ketikan melambat (manusia mengambil alih) echo muncul kembali. Petugas tidak perlu mengubah konfigurasi ketika ada mahasiswa tanpa KTM. `/api/config` tidak lagi mengirim `manual_input`; banner server & `checkup` menampilkan "Input: otomatis".
 
 ## Fase 4: Backlog (setelah hardware & sistem monitoring siap)
 - [ ] 4.1 Mode kamera (jalur A: **decode barcode/QR, bukan OCR**): flag `INPUT_MODE=scanner|camera|manual`, module `public/camera.js` (getUserMedia + decoder lokal di `public/vendor/`, tanpa CDN), hasil decode masuk `submitScan()` yang sama. Server/DB/sync: nol perubahan.
